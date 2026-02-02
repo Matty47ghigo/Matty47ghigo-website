@@ -1,0 +1,45 @@
+{
+  "admin": {
+    "email": "mattiaghigo60@gmail.com",
+    "passwordHash": "$2a$10$.4moAfMi1xRmkdds5NUF5uYWcW/7TzmPWX5vDBxEpYgxG6ugq.PYS",
+    "isSetup": true
+  },
+  "stats": {
+    "visitors": 1250,
+    "registeredUsers": 84,
+    "orders": 12
+  },
+  "messages": [
+    {
+      "id": 1,
+      "sender": "Mario Rossi",
+      "email": "mario@example.com",
+      "content": "Ciao, vorrei un preventivo!",
+      "date": "2025-05-10T10:00:00Z",
+      "read": false
+    },
+    {
+      "id": 2,
+      "sender": "Luigi Verdi",
+      "email": "luigi@example.com",
+      "content": "Ottimo lavoro sul sito!",
+      "date": "2025-05-11T14:30:00Z",
+      "read": true
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "Giovanni Muciaccia",
+      "email": "giovanni@artattack.it",
+      "role": "user"
+    },
+    {
+      "id": 2,
+      "name": "Gerry Scotti",
+      "email": "gerry@mediaset.it",
+      "role": "user"
+    }
+  ],
+  "orders": []
+}
