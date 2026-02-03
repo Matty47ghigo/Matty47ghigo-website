@@ -1,126 +1,151 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Mail, Lock, LogIn, Github, Chrome, MessageSquare, ArrowRight } from 'lucide-react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
-    const [isSetup, setIsSetup] = useState(true); // Default to true (login mode) until checked
-    const [loading, setLoading] = useState(true);
-    const [email, setEmail] = useState('mattiaghigo60@gmail.com');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [message, setMessage] = useState('');
     const navigate = useNavigate();
+    const [credentials, setCredentials] = useState({ email: '', password: '' });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    // Base URL for API - should be env var in real app
-    const API_URL = 'http://localhost:3001/api/auth';
+    const handleChange = (e) => {
+        setCredentials({ ...credentials, [e.target.name]: e.target.value });
+    };
 
-    useEffect(() => {
-        checkSetupStatus();
-    }, []);
-
-    const checkSetupStatus = async () => {
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
         try {
-            const res = await axios.get(`${API_URL}/status`);
-            setIsSetup(res.data.isSetup);
+            const res = await axios.post('http://localhost:3001/api/auth/login', credentials);
+            localStorage.setItem('user', JSON.stringify(res.data.user));
+            if (res.data.user.isAdmin) navigate('/dashboard');
+            else navigate('/user-dashboard');
         } catch (err) {
-            console.error("Error checking status", err);
-            setMessage("Errore di connessione al server.");
+            setError(err.response?.data?.message || 'Errore durante il login');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleSetup = async (e) => {
-        e.preventDefault();
-        if (password !== confirmPassword) {
-            setMessage("Le password non coincidono.");
-            return;
-        }
-
+    const handleGoogleSuccess = async (response) => {
         try {
-            const res = await axios.post(`${API_URL}/setup`, { email, password });
-            setMessage(res.data.message);
-            setIsSetup(true); // Switch to login mode
-            setPassword('');
-        } catch (err) {
-            setMessage(err.response?.data?.message || "Errore durante il setup");
-        }
-    };
-
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        try {
-            const res = await axios.post(`${API_URL}/login`, { email, password });
-            // Store user info (mock token)
+            const res = await axios.post('http://localhost:3001/api/auth/google', { token: response.credential });
             localStorage.setItem('user', JSON.stringify(res.data.user));
-            navigate('/dashboard');
+            if (res.data.user.isAdmin) navigate('/dashboard');
+            else navigate('/user-dashboard');
         } catch (err) {
-            setMessage(err.response?.data?.message || "Credenziali non valide");
+            setError('Errore login Google');
         }
     };
 
-    if (loading) return <div className="container" style={{paddingTop: '5rem', textAlign: 'center'}}>Caricamento...</div>;
+    const handleGitHubLogin = () => {
+        window.location.href = `https://github.com/login/oauth/authorize?client_id=Ov23liaNFwaY3610bNBP&scope=user:email`;
+    };
+
+    const handleDiscordLogin = () => {
+        window.location.href = 'https://discord.com/oauth2/authorize?client_id=1468322361093914882&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fcallback&scope=identify+email';
+    };
 
     return (
-        <div className="container" style={{ paddingTop: '5rem', maxWidth: '400px' }}>
-            <h1 className="title" style={{ textAlign: 'center' }}>
-                {isSetup ? "Admin Login" : "Benvenuto! Crea Password"}
-            </h1>
+        <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center p-6 relative overflow-hidden font-['Inter']">
+            {/* Background elements */}
+            <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[50%] bg-[#00e5ff] opacity-[0.03] blur-[120px] rounded-full" />
+            <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[50%] bg-[#5865F2] opacity-[0.03] blur-[120px] rounded-full" />
 
-            {message && <div style={{ 
-                backgroundColor: message.includes('success') ? 'rgba(76, 175, 80, 0.2)' : 'rgba(244, 67, 54, 0.2)', 
-                color: message.includes('success') ? '#4caf50' : '#f44336',
-                padding: '1rem', 
-                borderRadius: '5px', 
-                marginBottom: '1rem',
-                textAlign: 'center'
-            }}>
-                {message}
-            </div>}
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full max-w-md bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 md:p-12 shadow-2xl relative z-10"
+            >
+                <div className="text-center mb-10">
+                    <h1 className="text-4xl font-black tracking-tighter bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
+                        BENTORNATO
+                    </h1>
+                    <p className="text-gray-400 text-sm">Accedi al tuo account M47G Studios</p>
+                </div>
 
-            {!isSetup ? (
-                // Setup Form
-                <form onSubmit={handleSetup} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <p style={{ textAlign: 'center', opacity: 0.8 }}>Login iniziale per: {email}</p>
-                    <input 
-                        type="password" 
-                        placeholder="Nuova Password" 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)}
-                        style={{ padding: '10px', borderRadius: '5px', border: '1px solid #333', background: '#222', color: '#fff' }}
-                        required
-                    />
-                    <input 
-                        type="password" 
-                        placeholder="Conferma Password" 
-                        value={confirmPassword} 
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        style={{ padding: '10px', borderRadius: '5px', border: '1px solid #333', background: '#222', color: '#fff' }}
-                        required
-                    />
-                    <button type="submit" className="btn" style={{ width: '100%' }}>Crea Password</button>
+                {error && (
+                    <motion.div 
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="bg-red-500/10 text-red-400 border border-red-500/20 p-4 rounded-xl mb-6 text-sm"
+                    >
+                        {error}
+                    </motion.div>
+                )}
+
+                <form onSubmit={handleLogin} className="space-y-4">
+                    <div className="relative group">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-primary transition-colors">
+                            <Mail size={18} />
+                        </span>
+                        <input 
+                            type="email" name="email" placeholder="Email" required
+                            value={credentials.email} onChange={handleChange}
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:border-primary/50 transition-all placeholder:text-gray-600 text-sm"
+                        />
+                    </div>
+
+                    <div className="relative group">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-primary transition-colors">
+                            <Lock size={18} />
+                        </span>
+                        <input 
+                            type="password" name="password" placeholder="Password" required
+                            value={credentials.password} onChange={handleChange}
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 outline-none focus:border-primary/50 transition-all placeholder:text-gray-600 text-sm"
+                        />
+                    </div>
+
+                    <div className="text-right">
+                        <button type="button" className="text-xs text-gray-500 hover:text-primary transition-colors">Password dimenticata?</button>
+                    </div>
+
+                    <button 
+                        disabled={loading}
+                        className="w-full bg-primary hover:bg-primary/90 text-black font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-all mt-4 disabled:opacity-50 shadow-[0_0_20px_rgba(0,229,255,0.2)] active:scale-95"
+                    >
+                        {loading ? 'Entrando...' : 'Accedi'} <LogIn size={20} />
+                    </button>
                 </form>
-            ) : (
-                // Login Form
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                     <input 
-                        type="email" 
-                        placeholder="Email" 
-                        value={email} 
-                        disabled
-                        style={{ padding: '10px', borderRadius: '5px', border: '1px solid #333', background: '#222', color: '#777', cursor: 'not-allowed' }}
-                    />
-                    <input 
-                        type="password" 
-                        placeholder="Password" 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)}
-                        style={{ padding: '10px', borderRadius: '5px', border: '1px solid #333', background: '#222', color: '#fff' }}
-                        required
-                    />
-                    <button type="submit" className="btn" style={{ width: '100%' }}>Accedi</button>
-                </form>
-            )}
+
+                <div className="mt-8 pt-8 border-t border-white/10">
+                    <p className="text-center text-gray-500 text-xs mb-6 uppercase tracking-widest font-bold">Oppure continua con</p>
+                    <div className="space-y-3">
+                        <div className="flex justify-center">
+                            <GoogleLogin 
+                                onSuccess={handleGoogleSuccess}
+                                onError={() => setError('Google Login Failed')}
+                                theme="filled_black"
+                                shape="pill"
+                                width="100%"
+                            />
+                        </div>
+                        <div className="flex gap-3">
+                            <button 
+                                onClick={handleGitHubLogin}
+                                className="flex-1 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl py-3 flex items-center justify-center gap-2 text-sm transition-colors"
+                            >
+                                <Github size={18} /> GitHub
+                            </button>
+                            <button 
+                                onClick={handleDiscordLogin}
+                                className="flex-1 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl py-3 flex items-center justify-center gap-2 text-sm transition-colors"
+                            >
+                                <MessageSquare size={18} className="text-[#5865F2]" /> Discord
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <p className="text-center text-gray-400 text-sm mt-8">
+                        Non hai un account? <Link to="/register" className="text-primary hover:underline font-semibold">Crea uno qui</Link>
+                    </p>
+                </div>
+            </motion.div>
         </div>
     );
 };
