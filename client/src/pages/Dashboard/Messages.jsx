@@ -7,59 +7,60 @@ const Messages = () => {
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-        axios.get('http://localhost:3001/api/messages')
+        axios.get('/api/messages')
             .then(res => setMessages(res.data))
             .catch(err => console.error(err));
     }, []);
 
     return (
-        <div className="max-w-5xl">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+        <div style={{ maxWidth: '1024px' }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-col gap-8">
                 <div>
-                    <h2 className="text-3xl font-black mb-2 flex items-center gap-3">
-                        <MessageSquare className="text-primary" /> Messaggi Ricevuti
+                    <h2 className="text-3xl font-bold mb-2 flex-center" style={{ justifyContent: 'flex-start', gap: '0.75rem' }}>
+                        <MessageSquare style={{ color: 'white', opacity: 0.5 }} /> Messaggi Ricevuti
                     </h2>
-                    <p className="text-gray-400 text-sm">Controlla i messaggi inviati tramite il form dei contatti del portfolio.</p>
+                    <p className="text-muted text-sm">Controlla i messaggi inviati tramite il form dei contatti del portfolio.</p>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4">
+                <div className="flex-col gap-4">
                     <AnimatePresence>
                         {messages.length === 0 ? (
-                            <div className="text-center py-20 bg-white/5 rounded-3xl border border-dashed border-white/10 opacity-30">
-                                <Mail size={48} className="mx-auto mb-4" />
-                                <p>Nessun messaggio ricevuto al momento.</p>
+                            <div className="card" style={{ textAlign: 'center', padding: '5rem 0', opacity: 0.3, borderStyle: 'dashed' }}>
+                                <Mail size={48} style={{ margin: '0 auto 1.5rem' }} />
+                                <p className="text-sm">Nessun messaggio ricevuto al momento.</p>
                             </div>
                         ) : (
                             messages.map((msg, i) => (
                                 <motion.div 
                                     key={msg._id || i}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
+                                    initial={{ opacity: 0, scale: 0.98 }}
+                                    animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: i * 0.05 }}
-                                    className="bg-white/5 border border-white/10 rounded-[2rem] p-6 hover:bg-white/10 transition-all group"
+                                    className="card"
+                                    style={{ position: 'relative' }}
                                 >
-                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary border border-primary/20">
-                                                <UserIcon size={24} />
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                            <div style={{ width: '3rem', height: '3rem', background: 'rgba(255,255,255,0.03)', borderRadius: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border-subtle)' }}>
+                                                <UserIcon size={24} style={{ opacity: 0.5 }} />
                                             </div>
                                             <div>
-                                                <p className="font-bold text-white mb-0.5">{msg.name || msg.sender}</p>
-                                                <p className="text-xs text-gray-500 font-medium">{msg.email}</p>
+                                                <p style={{ fontWeight: 700, color: 'white', marginBottom: '0.25rem' }}>{msg.name || msg.sender}</p>
+                                                <p className="text-xs text-dim font-bold">{msg.email}</p>
                                             </div>
                                         </div>
-                                        <span className="text-[10px] font-black tracking-widest text-gray-600 bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
+                                        <span className="badge">
                                             {new Date(msg.date).toLocaleDateString('it-IT', { day: 'numeric', month: 'long' })}
                                         </span>
                                     </div>
                                     
-                                    <div className="mt-6 p-5 bg-black/20 rounded-2xl border border-white/5">
-                                        <p className="text-sm text-gray-300 leading-relaxed italic">"{msg.content || msg.message}"</p>
+                                    <div style={{ padding: '1.25rem', background: 'rgba(255,255,255,0.01)', borderRadius: '1rem', border: '1px solid var(--border-subtle)' }}>
+                                        <p className="text-sm italic" style={{ color: 'var(--text-muted)', lineHeight: 1.6 }}>"{msg.content || msg.message}"</p>
                                     </div>
 
-                                    <div className="mt-4 flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button className="text-xs font-bold text-gray-500 hover:text-white transition-colors px-4 py-2">Segna come letto</button>
-                                        <button className="text-xs font-bold text-red-400/50 hover:text-red-400 transition-colors bg-red-500/5 hover:bg-red-500/10 px-4 py-2 rounded-xl flex items-center gap-2">
+                                    <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                                        <button style={{ background: 'none', border: 'none', color: 'var(--text-dim)', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>Segna come letto</button>
+                                        <button className="flex-center" style={{ background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.1)', color: '#f87171', fontSize: '0.75rem', fontWeight: 700, padding: '0.5rem 1rem', borderRadius: '0.75rem', cursor: 'pointer', gap: '0.5rem' }}>
                                             <Trash2 size={14} /> Elimina
                                         </button>
                                     </div>

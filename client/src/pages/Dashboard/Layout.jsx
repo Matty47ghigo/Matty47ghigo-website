@@ -9,7 +9,9 @@ import {
     LogOut,
     Menu,
     X,
-    Bell
+    Bell,
+    BarChart3,
+    ShieldAlert
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -22,6 +24,7 @@ import Support from './Support';
 import Users from './Users'; // Only for admin
 import Messages from './Messages'; // Only for admin
 import AdminStats from './AdminStats';
+import AdminDangerZone from './AdminDangerZone';
 
 const DashboardLayout = () => {
     const navigate = useNavigate();
@@ -42,36 +45,45 @@ const DashboardLayout = () => {
         { name: 'Assistenza', path: '/dashboard/support', icon: LifeBuoy },
     ];
 
-    // Admin-specific items
     if (user.isAdmin) {
         navItems.push(
             { name: 'Analytics', path: '/dashboard/stats', icon: BarChart3, adminOnly: true },
             { name: 'Utenti', path: '/dashboard/users', icon: User, adminOnly: true },
-            { name: 'Messaggi', path: '/dashboard/messages', icon: Bell, adminOnly: true }
+            { name: 'Danger Zone', path: '/dashboard/admin-danger', icon: ShieldAlert, adminOnly: true }
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white flex font-['Inter']">
+        <div className="dashboard-layout">
             {/* Sidebar */}
             <motion.aside 
                 initial={false}
                 animate={{ width: isSidebarOpen ? '260px' : '80px' }}
-                className="bg-white/5 border-r border-white/10 backdrop-blur-xl flex flex-col z-20 transition-all duration-300"
+                className="sidebar"
+                style={{ transition: 'width 0.3s cubic-bezier(0.22, 1, 0.36, 1)' }}
             >
-                <div className="p-6 flex items-center justify-between">
+                <div className="sidebar-header">
                     {isSidebarOpen && (
-                        <h1 className="text-xl font-black tracking-tighter text-primary">M47G PLATFORM</h1>
+                        <h1 style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.05em', color: 'white' }}>Matty47ghigo</h1>
                     )}
                     <button 
                         onClick={() => setSidebarOpen(!isSidebarOpen)}
-                        className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                        style={{ 
+                            background: 'none', 
+                            border: 'none', 
+                            color: 'white', 
+                            cursor: 'pointer', 
+                            padding: '0.5rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            opacity: 0.5
+                        }}
                     >
                         {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
                     </button>
                 </div>
 
-                <nav className="flex-1 px-4 space-y-2 mt-4">
+                <nav className="sidebar-nav">
                     {navItems.map((item) => {
                         const Icon = item.icon;
                         const isActive = location.pathname === item.path;
@@ -79,46 +91,56 @@ const DashboardLayout = () => {
                             <Link 
                                 key={item.path} 
                                 to={item.path}
-                                className={`flex items-center gap-4 py-3.5 px-4 rounded-2xl transition-all ${
-                                    isActive 
-                                    ? 'bg-primary text-black font-bold shadow-[0_0_15px_rgba(0,229,255,0.3)]' 
-                                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                                }`}
+                                className={`sidebar-btn ${isActive ? 'sidebar-btn-active' : ''}`}
                             >
-                                <Icon size={22} />
+                                <Icon size={20} />
                                 {isSidebarOpen && <span>{item.name}</span>}
                                 {isActive && isSidebarOpen && item.adminOnly && (
-                                    <span className="ml-auto bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">ADMIN</span>
+                                    <span style={{ 
+                                        marginLeft: 'auto', 
+                                        background: '#ef4444', 
+                                        color: 'white', 
+                                        fontSize: '10px', 
+                                        padding: '2px 8px', 
+                                        borderRadius: '100px',
+                                        fontWeight: 700
+                                    }}>ADMIN</span>
                                 )}
                             </Link>
                         );
                     })}
                 </nav>
 
-                <div className="p-4 mt-auto">
+                <div className="sidebar-footer">
                     <button 
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-4 py-3.5 px-4 rounded-2xl text-red-400 hover:bg-red-500/10 transition-all font-semibold"
+                        className="sidebar-btn"
+                        style={{ color: '#f87171' }}
                     >
-                        <LogOut size={22} />
+                        <LogOut size={20} />
                         {isSidebarOpen && <span>Logout</span>}
                     </button>
                 </div>
             </motion.aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto">
-                <header className="h-20 bg-white/5 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-8">
-                    <div className="flex items-center gap-3">
-                        <img src={user.picture || '/favicon.png'} alt="Profile" className="w-10 h-10 rounded-full border border-white/20" />
+            <main className="main-container">
+                <header className="main-header">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <img src={user.picture || '/favicon.png'} alt="Profile" className="avatar" />
                         <div>
-                            <p className="text-sm font-bold text-white">{user.name} {user.surname}</p>
-                            <p className="text-[10px] text-gray-400 uppercase tracking-widest">{user.isAdmin ? 'Administrator' : 'Platform User'}</p>
+                            <p style={{ fontSize: '0.875rem', fontWeight: 700 }}>{user.name} {user.surname}</p>
+                            <p style={{ fontSize: '0.625rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                                {user.isAdmin ? 'Administrator' : 'Platform User'}
+                            </p>
                         </div>
+                    </div>
+                    <div style={{ opacity: 0.4 }}>
+                        <Bell size={20} />
                     </div>
                 </header>
 
-                <div className="p-8">
+                <div className="dashboard-content">
                     <Routes>
                         <Route path="/" element={<DashboardHome />} />
                         <Route path="/profile" element={<Profile />} />
@@ -130,6 +152,7 @@ const DashboardLayout = () => {
                                 <Route path="/users" element={<Users />} />
                                 <Route path="/messages" element={<Messages />} />
                                 <Route path="/stats" element={<AdminStats />} />
+                                <Route path="/admin-danger" element={<AdminDangerZone />} />
                             </>
                         )}
                     </Routes>

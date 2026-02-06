@@ -7,91 +7,128 @@ const Users = () => {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        axios.get('http://localhost:3001/api/users')
-            .then(res => setUsers(res.data))
-            .catch(err => console.error(err));
+        fetchUsers();
     }, []);
 
+    const fetchUsers = () => {
+        axios.get('/api/users')
+            .then(res => setUsers(res.data))
+            .catch(err => console.error(err));
+    };
+
+    const toggleRole = async (userId, isAdmin) => {
+        try {
+            await axios.patch(`/api/users/${userId}/role`, { isAdmin: !isAdmin });
+            fetchUsers();
+        } catch (err) {
+            alert('Errore aggiornamento ruolo');
+        }
+    };
+
+    const toggleBan = async (userId, isBanned) => {
+        if (!isBanned && !confirm('Sei sicuro di voler bannare questo utente? L\'account non potrà più autenticarsi.')) return;
+        try {
+            await axios.patch(`/api/users/${userId}/ban`, { isBanned: !isBanned });
+            fetchUsers();
+        } catch (err) {
+            alert('Errore ban utente');
+        }
+    };
+
     return (
-        <div className="max-w-6xl">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+        <div style={{ maxWidth: '1152px' }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-col gap-8">
                 <div>
-                    <h2 className="text-3xl font-black mb-2 flex items-center gap-3">
-                        <User className="text-primary" /> Utenti Registrati
+                    <h2 className="text-3xl font-bold mb-2 flex-center" style={{ justifyContent: 'flex-start', gap: '0.75rem' }}>
+                        <User style={{ color: 'white', opacity: 0.5 }} /> Utenti Registrati
                     </h2>
-                    <p className="text-gray-400 text-sm">Gestisci e visualizza tutti i profili utente attivi sulla piattaforma.</p>
+                    <p className="text-muted text-sm">Gestisci e visualizza tutti i profili utente attivi sulla piattaforma.</p>
                 </div>
 
-                <div className="bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden">
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="bg-white/[0.02] border-b border-white/10">
-                                <th className="p-6 text-xs font-black text-gray-500 uppercase tracking-widest">Utente</th>
-                                <th className="p-6 text-xs font-black text-gray-500 uppercase tracking-widest">Stato</th>
-                                <th className="p-6 text-xs font-black text-gray-500 uppercase tracking-widest">Provider</th>
-                                <th className="p-6 text-xs font-black text-gray-500 uppercase tracking-widest">Ultimo Accesso</th>
-                                <th className="p-6 text-xs font-black text-gray-500 uppercase tracking-widest text-right">Azioni</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                            {users.map((user, i) => (
-                                <motion.tr 
-                                    key={user._id || i}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: i * 0.05 }}
-                                    className="hover:bg-white/[0.02] transition-colors group"
-                                >
-                                    <td className="p-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="relative">
-                                                <img src={user.picture || '/favicon.png'} alt="P" className="w-10 h-10 rounded-full border border-white/10" />
-                                                {user.isAdmin && (
-                                                    <div className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 border border-[#050505]">
-                                                        <Shield size={10} />
-                                                    </div>
+                <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                    <div className="table-container">
+                        <table className="table">
+                            <thead>
+                                <tr style={{ background: 'rgba(255,255,255,0.01)' }}>
+                                    <th>Utente</th>
+                                    <th>Stato</th>
+                                    <th>Provider</th>
+                                    <th>Ultimo Accesso</th>
+                                    <th className="text-right">Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.map((user, i) => (
+                                    <motion.tr 
+                                        key={user._id || i}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: i * 0.05 }}
+                                    >
+                                        <td>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                                <div style={{ position: 'relative' }}>
+                                                    <img src={user.picture || '/favicon.png'} alt="P" style={{ width: '2.5rem', height: '2.5rem', borderRadius: '50%', border: '1px solid var(--border-subtle)', objectFit: 'cover' }} />
+                                                    {user.isAdmin && (
+                                                        <div style={{ position: 'absolute', top: '-0.25rem', right: '-0.25rem', background: '#ef4444', color: 'white', borderRadius: '50%', padding: '2px', border: '2px solid #000' }}>
+                                                            <Shield size={10} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <p style={{ fontWeight: 700, color: 'white', fontSize: '0.875rem' }}>{user.name} {user.surname}</p>
+                                                    <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontWeight: 600 }}>{user.email}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                {user.isVerified ? (
+                                                    <span className="status-badge status-delivered" style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '8px' }}>
+                                                        <CheckCircle size={10} /> Verificato
+                                                    </span>
+                                                ) : (
+                                                    <span className="status-badge status-pending" style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '8px' }}>
+                                                        <Clock size={10} /> Pendente
+                                                    </span>
                                                 )}
                                             </div>
-                                            <div>
-                                                <p className="font-bold text-sm text-white">{user.name} {user.surname}</p>
-                                                <p className="text-xs text-gray-500">{user.email}</p>
+                                        </td>
+                                        <td>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-dim)', fontSize: '0.75rem', fontWeight: 600 }}>
+                                                <Globe size={14} style={{ color: 'white', opacity: 0.2 }} />
+                                                <span style={{ textTransform: 'capitalize' }}>{user.provider}</span>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td className="p-6">
-                                        <div className="flex items-center gap-2">
-                                            {user.isVerified ? (
-                                                <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-green-400 bg-green-400/10 px-3 py-1 rounded-full border border-green-400/20">
-                                                    <CheckCircle size={12} /> Verificato
-                                                </span>
-                                            ) : (
-                                                <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-orange-400 bg-orange-400/10 px-3 py-1 rounded-full border border-orange-400/20">
-                                                    <Clock size={12} /> Pendente
-                                                </span>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td className="p-6">
-                                        <div className="flex items-center gap-2 text-xs text-gray-400">
-                                            <Globe size={14} className="text-primary" />
-                                            <span className="capitalize">{user.provider}</span>
-                                        </div>
-                                    </td>
-                                    <td className="p-6">
-                                        <div className="flex items-center gap-2 text-xs text-gray-400 text-white">
-                                            <Calendar size={14} />
-                                            {new Date(user.lastLogin).toLocaleDateString()}
-                                        </div>
-                                    </td>
-                                    <td className="p-6 text-right">
-                                        <button className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline opacity-0 group-hover:opacity-100 transition-opacity">
-                                            Dettagli
-                                        </button>
-                                    </td>
-                                </motion.tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                        </td>
+                                        <td>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'white', fontSize: '0.75rem', fontWeight: 600 }}>
+                                                <Calendar size={14} style={{ opacity: 0.2 }} />
+                                                {new Date(user.lastLogin).toLocaleDateString()}
+                                            </div>
+                                        </td>
+                                        <td className="text-right">
+                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                <button 
+                                                    onClick={() => toggleRole(user._id, user.isAdmin)}
+                                                    className="btn-secondary" 
+                                                    style={{ padding: '0.375rem 0.75rem', fontSize: '0.65rem', borderColor: user.isAdmin ? '#00e5ff33' : 'var(--border-subtle)' }}
+                                                >
+                                                    {user.isAdmin ? 'Rimuovi Admin' : 'Rendi Admin'}
+                                                </button>
+                                                <button 
+                                                    onClick={() => toggleBan(user._id, user.isBanned)}
+                                                    className="btn-secondary" 
+                                                    style={{ padding: '0.375rem 0.75rem', fontSize: '0.65rem', borderColor: user.isBanned ? '#4ade8033' : '#ef444433', color: user.isBanned ? '#4ade80' : '#ef4444' }}
+                                                >
+                                                    {user.isBanned ? 'Riabilita' : 'Banna'}
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </motion.tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </motion.div>
         </div>

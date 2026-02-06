@@ -21,16 +21,25 @@ const UserSchema = new mongoose.Schema({
     isAdmin: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
     verificationToken: String,
+    isBanned: { type: Boolean, default: false },
     linkedAccounts: {
-        google: String,
-        github: String,
-        discord: String
+        google: { type: String, default: null },
+        github: { type: String, default: null },
+        discord: { type: String, default: null }
     },
     paymentMethods: [{
         type: { type: String }, // card, paypal
         last4: String,
         brand: String
     }],
+    twoFactorSecret: String,
+    isTwoFactorEnabled: { type: Boolean, default: false },
+    twoFactorBackupCodes: [String],
+    twoFactorType: { type: String, enum: ['totp', 'email', 'sms'], default: 'totp' },
+    tempAuthCode: String,
+    tempAuthCodeExpires: Date,
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
     lastLogin: { type: Date, default: Date.now },
     createdAt: { type: Date, default: Date.now }
 });
@@ -45,8 +54,8 @@ const TicketSchema = new mongoose.Schema({
         content: String,
         date: { type: Date, default: Date.now }
     }],
-    rating: { type: Number, min: 1, max: 5 },
-    feedback: String,
+    rating: { type: Number, default: null },
+    feedbackComment: { type: String, default: null },
     createdAt: { type: Date, default: Date.now }
 });
 
@@ -64,6 +73,8 @@ const OrderSchema = new mongoose.Schema({
 
 const StatsSchema = new mongoose.Schema({
     visitors: { type: Number, default: 0 },
+    guestVisitors: { type: Number, default: 0 },
+    loggedVisitors: { type: Number, default: 0 },
     registeredUsers: { type: Number, default: 0 },
     orders: { type: Number, default: 0 },
     lastUpdated: { type: Date, default: Date.now }
@@ -91,8 +102,14 @@ const getAdminStatus = async () => {
 };
 
 // Increment visitor stat
-const incrementVisitors = async () => {
-    await Stats.findOneAndUpdate({}, { $inc: { visitors: 1 } }, { upsert: true, new: true });
+const incrementVisitors = async (isLogged = false) => {
+    const update = { $inc: { visitors: 1 } };
+    if (isLogged) {
+        update.$inc.loggedVisitors = 1;
+    } else {
+        update.$inc.guestVisitors = 1;
+    }
+    await Stats.findOneAndUpdate({}, update, { upsert: true, new: true });
 };
 
 module.exports = { 

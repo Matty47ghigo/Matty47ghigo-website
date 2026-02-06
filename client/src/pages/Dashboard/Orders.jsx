@@ -4,73 +4,68 @@ import { ShoppingCart, Package, Clock, CheckCircle, ExternalLink, ChevronRight }
 import axios from 'axios';
 
 const Orders = () => {
-    const [orders, setOrders] = useState([
-        { 
-            id: 'ORD-7721', 
-            status: 'consegnato', 
-            total: 129.00, 
-            date: '2026-01-15', 
-            items: [{ name: 'Sviluppo Bot Telegram Custom', price: 129, img: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=100&h=100&fit=crop' }] 
-        },
-        { 
-            id: 'ORD-8102', 
-            status: 'contabilizzare', 
-            total: 450.00, 
-            date: '2026-02-01', 
-            items: [{ name: 'Setup Server MongoDB Atlas', price: 450, img: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=100&h=100&fit=crop' }] 
-        },
-    ]);
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const [orders, setOrders] = useState([]);
 
-    const getStatusStyle = (status) => {
+    useEffect(() => {
+        if (user._id) {
+            axios.get(`/api/users/${user._id}/orders`)
+                .then(res => setOrders(res.data))
+                .catch(err => console.error(err));
+        }
+    }, [user._id]);
+
+    const getStatusClass = (status) => {
         switch(status) {
-            case 'consegnato': return 'bg-green-500/10 text-green-400 border-green-500/20';
-            case 'contabilizzare': return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
-            default: return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
+            case 'consegnato': return 'status-delivered';
+            case 'contabilizzare': return 'status-processing';
+            default: return 'status-closed';
         }
     };
 
     return (
-        <div className="max-w-5xl">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+        <div style={{ maxWidth: '1024px' }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-col gap-8">
                 <div>
-                    <h2 className="text-3xl font-black mb-2">I miei Ordini</h2>
-                    <p className="text-gray-400 text-sm">Visualizza la cronologia dei tuoi acquisti e lo stato dei lavori.</p>
+                    <h2 className="text-3xl font-bold mb-2">I miei Ordini</h2>
+                    <p className="text-muted text-sm">Visualizza la cronologia dei tuoi acquisti e lo stato dei lavori.</p>
                 </div>
 
-                <div className="space-y-4">
+                <div className="flex-col gap-4">
                     <AnimatePresence>
                         {orders.map((order, i) => (
                             <motion.div 
                                 key={order.id}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.1 }}
-                                className="bg-white/5 border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all flex flex-col md:flex-row items-center gap-6"
+                                className="card"
+                                style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}
                             >
-                                <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center shrink-0 border border-primary/20 overflow-hidden">
-                                    <img src={order.items[0].img} alt="Order" className="w-full h-full object-cover opacity-50" />
+                                <div style={{ width: '5rem', height: '5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '1rem', border: '1px solid var(--border-subtle)', overflow: 'hidden', flexShrink: 0 }}>
+                                    <img src={order.items[0].img} alt="Order" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.4 }} />
                                 </div>
 
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-1">
-                                        <span className="text-[10px] font-black tracking-widest text-gray-500 uppercase">{order.id}</span>
-                                        <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold uppercase tracking-widest ${getStatusStyle(order.status)}`}>
+                                <div style={{ flex: 1, minWidth: '200px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                                        <span className="text-dim font-bold tracking-widest uppercase" style={{ fontSize: '9px' }}>{order.id}</span>
+                                        <span className={`status-badge ${getStatusClass(order.status)}`} style={{ fontSize: '8px' }}>
                                             {order.status}
                                         </span>
                                     </div>
-                                    <h4 className="font-bold text-lg mb-1">{order.items[0].name}</h4>
-                                    <div className="flex items-center gap-4 text-xs text-gray-500">
-                                        <span className="flex items-center gap-1"><Clock size={14} /> {order.date}</span>
-                                        <span className="flex items-center gap-1"><CheckCircle size={14} /> Fatturato</span>
+                                    <h4 style={{ fontWeight: 700, fontSize: '1.125rem', marginBottom: '0.5rem', color: 'white' }}>{order.items[0].name}</h4>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: 'var(--text-dim)', fontSize: '0.75rem', fontWeight: 600 }}>
+                                        <span className="flex-center" style={{ gap: '0.25rem' }}><Clock size={14} /> {order.date}</span>
+                                        <span className="flex-center" style={{ gap: '0.25rem' }}><CheckCircle size={14} /> Fatturato</span>
                                     </div>
                                 </div>
 
-                                <div className="text-right flex items-center gap-6">
-                                    <div className="hidden md:block">
-                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Totale</p>
-                                        <p className="text-xl font-black text-white">€{order.total.toFixed(2)}</p>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <p className="text-dim font-bold uppercase tracking-widest mb-1" style={{ fontSize: '9px' }}>Totale</p>
+                                        <p style={{ fontSize: '1.25rem', fontWeight: 900, color: 'white' }}>€{order.total.toFixed(2)}</p>
                                     </div>
-                                    <button className="p-3 bg-white/5 hover:bg-primary hover:text-black rounded-xl transition-all">
+                                    <button className="btn-primary" style={{ width: 'auto', padding: '0.75rem', background: 'rgba(255,255,255,0.03)', color: 'white', border: '1px solid var(--border-subtle)' }}>
                                         <ChevronRight size={20} />
                                     </button>
                                 </div>
@@ -79,12 +74,12 @@ const Orders = () => {
                     </AnimatePresence>
                 </div>
 
-                <div className="bg-white/5 border border-dashed border-white/10 rounded-3xl p-10 text-center flex flex-col items-center justify-center grayscale hover:grayscale-0 transition-all cursor-pointer group">
-                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <ShoppingCart size={32} className="text-gray-500 group-hover:text-primary" />
+                <div className="card flex-col" style={{ padding: '3rem', borderStyle: 'dashed', textAlign: 'center', alignItems: 'center', justifyContent: 'center', opacity: 0.3, transition: 'var(--transition-smooth)' }}>
+                    <div style={{ width: '4rem', height: '4rem', background: 'rgba(255,255,255,0.03)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', border: '1px solid var(--border-subtle)' }}>
+                        <ShoppingCart size={32} style={{ opacity: 0.5 }} />
                     </div>
-                    <p className="text-gray-500 font-bold group-hover:text-white">Sfogliate i nostri servizi</p>
-                    <p className="text-xs text-gray-600 mt-2">Nuovi pacchetti disponibili ogni mese.</p>
+                    <p style={{ fontWeight: 700, marginBottom: '0.5rem' }}>Sfogliate i nostri servizi</p>
+                    <p className="text-xs text-dim">Nuovi pacchetti disponibili ogni mese.</p>
                 </div>
             </motion.div>
         </div>

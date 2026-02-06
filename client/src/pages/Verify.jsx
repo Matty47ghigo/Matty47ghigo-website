@@ -11,7 +11,7 @@ const Verify = () => {
 
     useEffect(() => {
         if (token) {
-            axios.get(`http://localhost:3001/api/auth/verify?token=${token}`)
+            axios.get(`/api/auth/verify?token=${token}`)
                 .then(() => setStatus('success'))
                 .catch(() => setStatus('error'));
         } else {
@@ -20,32 +20,34 @@ const Verify = () => {
     }, [token]);
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center p-6 relative overflow-hidden font-['Inter']">
-            <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[50%] bg-[#00e5ff] opacity-[0.03] blur-[120px] rounded-full" />
+        <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-black)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
+            <div className="top-glow" />
             
             <motion.div 
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="w-full max-w-md bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[3rem] p-12 text-center shadow-2xl relative z-10"
+                className="card"
+                style={{ width: '100%', maxWidth: '448px', padding: '3rem', textAlign: 'center', zIndex: 10 }}
             >
                 {status === 'loading' && (
-                    <div className="flex flex-col items-center">
-                        <Loader2 size={64} className="text-primary animate-spin mb-6" />
-                        <h2 className="text-2xl font-black mb-2 uppercase tracking-tighter">Verifica in corso</h2>
-                        <p className="text-gray-400 text-sm">Stiamo attivando il tuo account M47G Studios...</p>
+                    <div className="flex-col" style={{ alignItems: 'center' }}>
+                        <Loader2 size={64} style={{ color: 'white', marginBottom: '1.5rem' }} className="animate-spin" />
+                        <h2 className="text-2xl font-bold mb-2 uppercase tracking-widest">Verifica in corso</h2>
+                        <p className="text-muted text-sm">Stiamo attivando il tuo account Matty47ghigo Studios...</p>
                     </div>
                 )}
 
                 {status === 'success' && (
-                    <div className="flex flex-col items-center">
-                        <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mb-6 border border-green-500/20">
+                    <div className="flex-col" style={{ alignItems: 'center' }}>
+                        <div style={{ width: '5rem', height: '5rem', background: 'rgba(34, 197, 94, 0.1)', color: '#4ade80', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', border: '1px solid rgba(34, 197, 94, 0.1)' }}>
                             <CheckCircle size={40} />
                         </div>
-                        <h2 className="text-3xl font-black mb-2 uppercase tracking-tighter text-green-400">Account Attivato!</h2>
-                        <p className="text-gray-400 text-sm mb-10">La tua email è stata verificata correttamente. Ora puoi accedere a tutte le funzionalità della piattaforma.</p>
+                        <h2 className="text-2xl font-bold mb-2 uppercase tracking-widest" style={{ color: '#4ade80' }}>Account Attivato!</h2>
+                        <p className="text-muted text-sm mb-10">La tua email è stata verificata correttamente. Ora puoi accedere a tutte le funzionalità della piattaforma.</p>
                         <Link 
                             to="/login"
-                            className="w-full bg-primary text-black font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,229,255,0.3)] hover:scale-[1.02] transition-all"
+                            className="btn-primary flex-center"
+                            style={{ gap: '0.5rem' }}
                         >
                             Vai al Login <ArrowRight size={20} />
                         </Link>
@@ -53,15 +55,15 @@ const Verify = () => {
                 )}
 
                 {status === 'error' && (
-                    <div className="flex flex-col items-center">
-                        <div className="w-20 h-20 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
+                    <div className="flex-col" style={{ alignItems: 'center' }}>
+                        <div style={{ width: '5rem', height: '5rem', background: 'rgba(239, 68, 68, 0.1)', color: '#f87171', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', border: '1px solid rgba(239, 68, 68, 0.1)' }}>
                             <XCircle size={40} />
                         </div>
-                        <h2 className="text-3xl font-black mb-2 uppercase tracking-tighter text-red-400">Errore Verifica</h2>
-                        <p className="text-gray-400 text-sm mb-10">Il link di attivazione non è valido o è già stato utilizzato. Se il problema persiste, contatta il supporto.</p>
+                        <h2 className="text-2xl font-bold mb-2 uppercase tracking-widest" style={{ color: '#f87171' }}>Errore Verifica</h2>
+                        <p className="text-muted text-sm mb-10">Il link di attivazione non è valido o è già stato utilizzato. Se il problema persiste, contatta il supporto.</p>
                         <Link 
                             to="/"
-                            className="w-full bg-white/10 text-white font-bold py-4 rounded-2xl hover:bg-white/20 transition-all border border-white/10"
+                            className="btn-secondary"
                         >
                             Torna alla Home
                         </Link>

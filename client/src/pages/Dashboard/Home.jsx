@@ -1,76 +1,90 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingCart, LifeBuoy, CreditCard, ArrowRight } from 'lucide-react';
+import { ShoppingCart, LifeBuoy, CreditCard, ArrowRight, User } from 'lucide-react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+    const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const [stats, setStats] = useState({ visitors: 0, registeredUsers: 0, orders: 0 });
+    const [userStats, setUserStats] = useState({ orders: 0, tickets: 0, payments: 0 });
 
     useEffect(() => {
-        axios.get('http://localhost:3001/api/stats')
+        axios.get('/api/stats')
             .then(res => setStats(res.data))
             .catch(err => console.error(err));
-    }, []);
+            
+        if (user._id) {
+            axios.get(`/api/users/${user._id}/stats`)
+                .then(res => setUserStats(res.data))
+                .catch(err => console.error(err));
+        }
+    }, [user._id]);
 
-    const cards = [
-        { title: 'I tuoi Ordini', value: stats.orders, icon: ShoppingCart, color: 'text-primary' },
-        { title: 'Ticket Aperti', value: 0, icon: LifeBuoy, color: 'text-orange-400' },
-        { title: 'Metodi Pagamento', value: 0, icon: CreditCard, color: 'text-purple-400' },
+    const cards = user.isAdmin ? [
+        { title: 'Visitatori Totali', value: stats.visitors, icon: User, color: 'white', link: '/dashboard/stats' }, // Linking to analytics
+        { title: 'Utenti Registrati', value: stats.registeredUsers, icon: User, color: '#4ade80', link: '/dashboard/users' },
+        { title: 'Ticket Aperti', value: stats.openTickets || 0, icon: LifeBuoy, color: '#fb923c', link: '/dashboard/support' },
+    ] : [
+        { title: 'I tuoi Ordini', value: userStats.orders, icon: ShoppingCart, color: 'white', link: '/dashboard/orders' },
+        { title: 'Ticket Aperti', value: userStats.tickets, icon: LifeBuoy, color: '#fb923c', link: '/dashboard/support' },
+        { title: 'Metodi Pagamento', value: userStats.payments, icon: CreditCard, color: '#c084fc', link: '/dashboard/payments' },
     ];
 
     return (
-        <div className="max-w-6xl">
+        <div style={{ maxWidth: '1152px' }}>
             <motion.div 
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="mb-12"
             >
-                <h2 className="text-4xl font-black mb-2">Ciao {user.name},</h2>
-                <p className="text-xl text-gray-400">Cosa vuoi fare oggi?</p>
+                <h2 className="text-4xl font-bold mb-2">Ciao {user.name},</h2>
+                <p className="text-xl text-muted">Cosa vuoi fare oggi?</p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="grid grid-cols-1 md-grid-cols-3 gap-6 mb-12">
                 {cards.map((card, i) => (
                     <motion.div 
                         key={i}
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.1 }}
-                        className="bg-white/5 border border-white/10 rounded-3xl p-8 hover:bg-white/10 transition-all group"
+                        className="card"
+                        style={{ cursor: 'pointer', transition: 'var(--transition-smooth)' }}
+                        onClick={() => navigate(card.link)}
                     >
-                        <card.icon className={`mb-6 ${card.color}`} size={32} />
-                        <p className="text-gray-400 font-semibold mb-2">{card.title}</p>
-                        <p className="text-3xl font-black mb-4">{card.value}</p>
-                        <button className="flex items-center gap-2 text-sm text-primary font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                            Gestisci <ArrowRight size={16} />
+                        <card.icon style={{ color: card.color, marginBottom: '1.5rem', opacity: 0.8 }} size={32} />
+                        <p className="text-muted font-bold mb-2 text-xs uppercase tracking-widest">{card.title}</p>
+                        <p className="text-3xl font-bold mb-4">{card.value}</p>
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); navigate(card.link); }}
+                            className="btn-primary" 
+                            style={{ width: 'auto', padding: '0.5rem 1rem', fontSize: '0.75rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.05)' }}
+                        >
+                            Gestisci <ArrowRight size={14} style={{ marginLeft: '4px' }} />
                         </button>
                     </motion.div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white/5 border border-white/10 rounded-3xl p-8">
-                    <h3 className="text-xl font-bold mb-6">Attività Recente</h3>
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl">
-                            <div className="w-10 h-10 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center">
-                                <ShoppingCart size={20} />
-                            </div>
-                            <div>
-                                <p className="text-sm font-bold">Ordine completato</p>
-                                <p className="text-xs text-gray-400">2 ore fa</p>
-                            </div>
-                        </div>
-                        <p className="text-xs text-gray-500 text-center py-4">Nessuna altra attività recente</p>
+            <div className="grid grid-cols-1 lg-grid-cols-2 gap-6">
+                <div className="card">
+                    <h3 className="text-lg font-bold mb-6">Attività Recente</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <p className="text-xs text-dim" style={{ textAlign: 'center', padding: '2rem 0' }}>Nessuna attività recente. Le tue azioni appariranno qui.</p>
                     </div>
                 </div>
 
-                <div className="bg-white/5 border border-white/10 rounded-3xl p-8 text-center flex flex-col items-center justify-center">
-                    <LifeBuoy size={48} className="text-primary/50 mb-4" />
-                    <h3 className="text-xl font-bold mb-2">Hai bisogno di aiuto?</h3>
-                    <p className="text-sm text-gray-400 mb-6">I nostri esperti sono pronti ad aiutarti in qualsiasi momento.</p>
-                    <button className="bg-primary text-black font-bold py-3 px-8 rounded-2xl hover:shadow-[0_0_20px_rgba(0,229,255,0.3)] transition-all">
+                <div className="card flex-col" style={{ textAlign: 'center', justifyContent: 'center' }}>
+                    <LifeBuoy size={48} style={{ opacity: 0.2, marginBottom: '1.5rem' }} />
+                    <h3 className="text-lg font-bold mb-2">Hai bisogno di aiuto?</h3>
+                    <p className="text-sm text-muted mb-6">I nostri esperti sono pronti ad aiutarti in qualsiasi momento.</p>
+                    <button 
+                        onClick={() => navigate('/dashboard/support')}
+                        className="btn-primary" 
+                        style={{ width: 'fit-content', paddingLeft: '2rem', paddingRight: '2rem', margin: '0 auto' }}
+                    >
                         Apri un Ticket
                     </button>
                 </div>

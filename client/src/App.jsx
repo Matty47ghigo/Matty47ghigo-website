@@ -10,6 +10,9 @@ import Callback from './pages/Callback';
 import UserDashboard from './pages/UserDashboard';
 import Register from './pages/Register';
 import Verify from './pages/Verify';
+import Feedback from './pages/Feedback';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -19,6 +22,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify" element={<Verify />} />
+        <Route path="/feedback" element={<Feedback />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/admin" element={<Login />} /> {/* Redirect/Alias */}
         <Route path="/callback" element={<Callback />} />
         <Route 
