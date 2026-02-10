@@ -84,6 +84,8 @@ const Login = () => {
     };
 
     const handleGoogleSuccess = async (response) => {
+        console.log('Google Client ID usato (client):', import.meta.env.VITE_GOOGLE_CLIENT_ID);
+        console.log('Google response:', response);
         try {
             const res = await axios.post('/api/auth/google', { token: response.credential });
             

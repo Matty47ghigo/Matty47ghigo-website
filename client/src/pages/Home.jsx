@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGoogleLogin, GoogleLogin } from '@react-oauth/google';
-import { Briefcase, Code, Terminal, MessageSquare, ArrowRight, Zap, Layout, Settings, Github, Cpu, Globe, Database, ShieldCheck, Menu, X } from 'lucide-react';
+import { Briefcase, Code, Terminal, MessageSquare, ArrowRight, Zap, Layout, Settings, Github, Cpu, Globe, Database, ShieldCheck, Menu, X, ShoppingCart } from 'lucide-react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import logo from '../assets/logo.png';
@@ -165,6 +165,7 @@ const Home = () => {
           <a href="#about" className="nav-link" style={{ textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}>Chi Sono</a>
           <a href="#experience" className="nav-link" style={{ textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}>Esperienza</a>
           <a href="#services" className="nav-link" style={{ textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}>Servizi</a>
+          <Link to="/shop" className="nav-link" style={{ textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600, color: 'var(--accent)' }}>Shop</Link>
           
           <div style={{ position: 'relative' }}>
             <button 
@@ -265,6 +266,7 @@ const Home = () => {
                     <a href="#about" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'white', textDecoration: 'none' }}>Chi Sono</a>
                     <a href="#experience" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'white', textDecoration: 'none' }}>Esperienza</a>
                     <a href="#services" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'white', textDecoration: 'none' }}>Servizi</a>
+                    <Link to="/shop" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--accent)', textDecoration: 'none' }}>Shop</Link>
                     
                     <div style={{ height: '1px', background: 'var(--border-subtle)', margin: '1rem 0' }} />
                     
@@ -508,6 +510,58 @@ const Home = () => {
                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>{s.desc}</p>
              </motion.div>
            ))}
+        </div>
+      </section>
+
+      {/* Shop CTA Section */}
+      <section style={{ padding: '6rem 1.5rem', background: 'linear-gradient(180deg, transparent 0%, rgba(0,229,255,0.05) 100%)' }}>
+        <div className="container" style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div style={{ 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: '0.75rem',
+              padding: '0.5rem 1rem', 
+              borderRadius: '100px', 
+              background: 'rgba(0,229,255,0.1)', 
+              border: '1px solid rgba(0,229,255,0.2)',
+              fontSize: '0.75rem', 
+              fontWeight: 700,
+              color: '#00e5ff',
+              letterSpacing: '0.05em',
+              marginBottom: '1.5rem'
+            }}>
+              <ShoppingCart size={14} />
+              SERVICE SHOP DISPONIBILE
+            </div>
+            <h2 className="title" style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>
+              Scopri tutti i nostri <span className="text-gradient">Servizi</span>
+            </h2>
+            <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)', marginBottom: '2.5rem', lineHeight: 1.7 }}>
+              Dallo sviluppo web alla configurazione server, dai bot Discord alle consulenze tecniche.
+              Trova la soluzione perfetta per le tue esigenze.
+            </p>
+            <Link 
+              to="/shop"
+              className="btn-primary"
+              style={{ 
+                padding: '1rem 2.5rem', 
+                width: 'auto', 
+                fontSize: '1rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.75rem'
+              }}
+            >
+              <ShoppingCart size={18} />
+              Accedi allo Shop
+              <ArrowRight size={18} />
+            </Link>
+          </motion.div>
         </div>
       </section>
 

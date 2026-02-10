@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Mail, Lock, MapPin, Globe, Github, Chrome, MessageSquare, Save, ShieldCheck, AlertCircle, Trash2, Shield, X, Copy } from 'lucide-react';
+import { User, Mail, Lock, MapPin, Globe, Github, Chrome, MessageSquare, Save, ShieldCheck, AlertCircle, Trash2, Shield, X, Copy, CreditCard } from 'lucide-react';
 import axios from 'axios';
+import CreditCardForm from '../../components/CreditCard';
 
 const Profile = () => {
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
@@ -20,6 +21,9 @@ const Profile = () => {
     const [address, setAddress] = useState(user.address || '');
     const [cap, setCap] = useState(user.cap || '');
     const [profilePicture, setProfilePicture] = useState(user.picture || '');
+    
+    // Credit Card state
+    const [savedCard, setSavedCard] = useState(user.savedCard || null);
 
     const handleSave = async () => {
         try {
@@ -34,6 +38,22 @@ const Profile = () => {
             alert('Profilo aggiornato con successo!');
         } catch (err) {
             alert('Errore durante il salvataggio: ' + (err.response?.data?.message || err.message));
+        }
+    };
+    
+    // Handle saving credit card
+    const handleSaveCard = async (cardData) => {
+        try {
+            const res = await axios.patch(`/api/users/${user._id}`, {
+                savedCard: cardData
+            });
+            setSavedCard(cardData);
+            const updatedUser = { ...user, savedCard: cardData };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            setUser(updatedUser);
+            alert('Carta di credito salvata con successo!');
+        } catch (err) {
+            alert('Errore durante il salvataggio della carta: ' + (err.response?.data?.message || err.message));
         }
     };
     

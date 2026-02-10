@@ -8,7 +8,7 @@ const AdminDangerZone = () => {
     const [loading, setLoading] = useState(false);
 
     const handleHardReset = async () => {
-        const confirm1 = confirm('ATTENZIONE: Stai per eseguire un HARD RESET. Questo eliminerà TUTTI gli utenti (tranne te), tutti i ticket e tutti gli ordini.');
+        const confirm1 = confirm('ATTENZIONE: Stai per eseguire un HARD RESET. Questo eliminerà TUTTI gli utenti (tranne te), tutti i ticket, ordini e prodotti dello shop.');
         if (!confirm1) return;
         
         const confirm2 = confirm('Confermi l\'azione irreversibile?');
@@ -36,9 +36,25 @@ const AdminDangerZone = () => {
         if (!password) return;
         if (password !== 'Matty47ghigo231747#!') return alert('Password errata!');
         try {
-            // Reusing the existing reset endpoint for specific collections or adding specialized logic
-            // For now, the existing reset clears tickets and orders.
             const res = await axios.post('/api/admin/reset', { password });
+            alert(res.data.message);
+        } catch (err) {
+            alert('Errore: ' + (err.response?.data?.message || err.message));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResetProducts = async () => {
+        const confirmAction = confirm('Vuoi davvero eliminare e ripristinare tutti i prodotti dello shop?');
+        if (!confirmAction) return;
+
+        const password = prompt('Inserisci la password per resettare i prodotti:');
+        if (!password) return;
+        if (password !== 'Matty47ghigo231747#') return alert('Password errata!');
+        
+        try {
+            const res = await axios.post('/api/admin/reset-products', { password });
             alert(res.data.message);
         } catch (err) {
             alert('Errore: ' + (err.response?.data?.message || err.message));
@@ -116,6 +132,14 @@ const AdminDangerZone = () => {
                                 <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Azzera le visualizzazioni del sito.</p>
                             </div>
                             <button className="btn-secondary" style={{ width: 'auto', fontSize: '0.75rem' }}>Reset</button>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '15px', border: '1px solid var(--border-subtle)' }}>
+                            <div>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: 700 }}>Reset Shop Products</h4>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>Elimina e ripristina tutti i prodotti dello shop.</p>
+                            </div>
+                            <button onClick={handleResetProducts} className="btn-secondary" style={{ width: 'auto', fontSize: '0.75rem', borderColor: 'rgba(0,229,255,0.3)', color: '#00e5ff' }}>Reset</button>
                         </div>
                     </div>
                 </motion.div>

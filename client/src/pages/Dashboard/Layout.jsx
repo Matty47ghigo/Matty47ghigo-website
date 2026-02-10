@@ -127,7 +127,12 @@ const DashboardLayout = () => {
             <main className="main-container">
                 <header className="main-header">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <img src={user.picture || '/favicon.png'} alt="Profile" className="avatar" />
+                        <img 
+    src={user.picture || 'https://ui-avatars.com/api/?name=' + (user.name || 'U') + '&background=00e5ff&color=000'}
+    alt="Profile" 
+    className="avatar" 
+    onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + (user.name || 'U') + '&background=00e5ff&color=000'; }}
+/>
                         <div>
                             <p style={{ fontSize: '0.875rem', fontWeight: 700 }}>{user.name} {user.surname}</p>
                             <p style={{ fontSize: '0.625rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>

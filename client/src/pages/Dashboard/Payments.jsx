@@ -2,26 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CreditCard, Plus, Trash2, ShieldCheck, Lock, X } from 'lucide-react';
 import axios from 'axios';
+import CreditCardForm from '../../components/CreditCard';
 
 const Payments = () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const [methods, setMethods] = useState([]);
     const [showAddModal, setShowAddModal] = useState(false);
-    const [newCard, setNewCard] = useState({ number: '', expiry: '', cvc: '', brand: 'visa' });
-    
-    // Automatic Card Brand Detection
-    useEffect(() => {
-        const number = newCard.number.replace(/\s?/g, '');
-        if (number.length >= 1) {
-            if (number.startsWith('4')) {
-                setNewCard(prev => ({ ...prev, brand: 'visa' }));
-            } else if (number.startsWith('51') || number.startsWith('52') || number.startsWith('53') || number.startsWith('54') || number.startsWith('55')) {
-                setNewCard(prev => ({ ...prev, brand: 'mastercard' }));
-            } else if (number.startsWith('34') || number.startsWith('37')) {
-                setNewCard(prev => ({ ...prev, brand: 'amex' }));
-            }
-        }
-    }, [newCard.number]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -40,20 +26,18 @@ const Payments = () => {
         }
     };
 
-    const addMethod = async (e) => {
-        e.preventDefault();
+    const handleSaveCard = async (cardData) => {
         setLoading(true);
         try {
             const res = await axios.post(`/api/users/${user._id}/payments`, {
                 type: 'Carta',
-                last4: newCard.number.slice(-4),
-                brand: newCard.brand
+                last4: cardData.cardNumber.replace(/\s/g, '').slice(-4),
+                brand: cardData.cardType
             });
             setMethods(res.data);
             setShowAddModal(false);
-            setNewCard({ number: '', expiry: '', cvc: '', brand: 'visa' });
         } catch (err) {
-            alert('Errore aggiunta carta');
+            alert('Errore aggiunta carta: ' + (err.response?.data?.message || err.message));
         } finally {
             setLoading(false);
         }
@@ -139,66 +123,15 @@ const Payments = () => {
                 <AnimatePresence>
                     {showAddModal && (
                         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
-                            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="card" style={{ maxWidth: '450px', width: '100%', padding: '2.5rem' }}>
-                                <div className="flex-center" style={{ justifyContent: 'space-between', marginBottom: '2rem' }}>
+                            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="card" style={{ maxWidth: '520px', width: '100%', padding: '1.5rem' }}>
+                                <div className="flex-center" style={{ justifyContent: 'space-between', marginBottom: '1rem' }}>
                                     <h3 className="text-xl font-bold">Aggiungi Carta</h3>
                                     <X size={20} style={{ cursor: 'pointer', opacity: 0.5 }} onClick={() => setShowAddModal(false)} />
                                 </div>
-                                <form onSubmit={addMethod} className="flex-col gap-4">
-                                    <div className="input-group">
-                                        <label className="input-label">Numero Carta</label>
-                                        <input 
-                                            type="text" 
-                                            name="ccnumber"
-                                            autoComplete="cc-number"
-                                            placeholder="4242 4242 4242 4242" 
-                                            required
-                                            value={newCard.number}
-                                            onChange={(e) => setNewCard({...newCard, number: e.target.value})}
-                                            className="input-field" 
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="input-group">
-                                            <label className="input-label">Scadenza</label>
-                                            <input 
-                                                type="text" 
-                                                name="ccexp"
-                                                autoComplete="cc-exp"
-                                                placeholder="MM/YY" 
-                                                required 
-                                                className="input-field" 
-                                            />
-                                        </div>
-                                        <div className="input-group">
-                                            <label className="input-label">CVC</label>
-                                            <input 
-                                                type="text" 
-                                                name="cccsc"
-                                                autoComplete="cc-csc"
-                                                placeholder="123" 
-                                                required 
-                                                className="input-field" 
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="input-group">
-                                        <label className="input-label">Circuito</label>
-                                        <select 
-                                            className="input-field" 
-                                            value={newCard.brand}
-                                            onChange={(e) => setNewCard({...newCard, brand: e.target.value})}
-                                            style={{ appearance: 'none' }}
-                                        >
-                                            <option value="visa">Visa</option>
-                                            <option value="mastercard">Mastercard</option>
-                                            <option value="amex">American Express</option>
-                                        </select>
-                                    </div>
-                                    <button disabled={loading} className="btn-primary" style={{ marginTop: '1rem' }}>
-                                        {loading ? 'Salvataggio...' : 'Salva Carta'}
-                                    </button>
-                                </form>
+                                <CreditCardForm 
+                                    onSave={handleSaveCard}
+                                    savedCard={null}
+                                />
                             </motion.div>
                         </div>
                     )}

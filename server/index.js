@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const axios = require('axios');
 const crypto = require('crypto');
 const { OAuth2Client } = require('google-auth-library');
-const { User, Ticket, Order, Stats, AdminConfig, getAdminStatus, incrementVisitors } = require('./db');
+const { User, Ticket, Order, Stats, AdminConfig, Product, getAdminStatus, incrementVisitors } = require('./db');
 const { sendVerificationEmail, sendTicketClosedEmail, sendAdminNotification, send2FACodeEmail } = require('./email');
 const { authenticator } = require('otplib');
 
@@ -24,6 +24,7 @@ const QRCode = require('qrcode');
 require('dotenv').config();
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+console.log('Google Client ID caricato:', process.env.GOOGLE_CLIENT_ID);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -555,6 +556,27 @@ app.patch('/api/users/:id/ban', async (req, res) => {
     }
 });
 
+// --- User Profile Update ---
+app.patch('/api/users/:id', async (req, res) => {
+    const { address, cap, picture, name, surname, email } = req.body;
+    try {
+        const updateData = {};
+        if (address !== undefined) updateData.address = address;
+        if (cap !== undefined) updateData.cap = cap;
+        if (picture !== undefined) updateData.picture = picture;
+        if (name !== undefined) updateData.name = name;
+        if (surname !== undefined) updateData.surname = surname;
+        if (email !== undefined) updateData.email = email;
+        
+        const user = await User.findByIdAndUpdate(req.params.id, updateData, { new: true });
+        if (!user) return res.status(404).json({ message: "Utente non trovato" });
+        res.json(user);
+    } catch (error) {
+        console.error("Profile update error:", error);
+        res.status(500).json({ message: "Errore aggiornamento profilo" });
+    }
+});
+
 // --- Ticket Messaging & Status ---
 
 app.post('/api/tickets/:id/message', async (req, res) => {
@@ -745,6 +767,7 @@ app.post('/api/admin/hard-reset', async (req, res) => {
     try {
         await Ticket.deleteMany({});
         await Order.deleteMany({});
+        await Product.deleteMany({});
         // Delete all users EXCEPT the primary admin
         await User.deleteMany({ email: { $ne: 'mattiaghigo60@gmail.com' } });
         
@@ -758,7 +781,7 @@ app.post('/api/admin/hard-reset', async (req, res) => {
             await stats.save();
         }
 
-        res.json({ message: "HARD RESET COMPLETATO. Tutti gli utenti (eccetto admin), ticket e ordini sono stati eliminati." });
+        res.json({ message: "HARD RESET COMPLETATO. Tutti gli utenti (eccetto admin), ticket, ordini e prodotti shop sono stati eliminati." });
     } catch (error) {
         res.status(500).json({ message: "Errore durante l'hard reset" });
     }
@@ -955,4 +978,284 @@ app.get('/api/users/:id/stats', async (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+});
+
+// --- Shop API Routes ---
+
+// Get all products
+app.get('/api/products', async (req, res) => {
+    try {
+        const { category } = req.query;
+        const filter = { isActive: true };
+        if (category) {
+            filter.category = category;
+        }
+        const products = await Product.find(filter).sort({ category: 1, priceValue: 1 });
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ message: "Errore caricamento prodotti" });
+    }
+});
+
+// Get single product
+app.get('/api/products/:id', async (req, res) => {
+    try {
+        const product = await Product.findOne({ id: req.params.id, isActive: true });
+        if (!product) {
+            return res.status(404).json({ message: "Prodotto non trovato" });
+        }
+        res.json(product);
+    } catch (error) {
+        res.status(500).json({ message: "Errore caricamento prodotto" });
+    }
+});
+
+// Create product (admin only)
+app.post('/api/products', async (req, res) => {
+    try {
+        const product = await Product.create(req.body);
+        res.json(product);
+    } catch (error) {
+        res.status(500).json({ message: "Errore creazione prodotto" });
+    }
+});
+
+// Update product (admin only)
+app.put('/api/products/:id', async (req, res) => {
+    try {
+        const product = await Product.findOneAndUpdate(
+            { id: req.params.id },
+            req.body,
+            { new: true }
+        );
+        if (!product) {
+            return res.status(404).json({ message: "Prodotto non trovato" });
+        }
+        res.json(product);
+    } catch (error) {
+        res.status(500).json({ message: "Errore aggiornamento prodotto" });
+    }
+});
+
+// Delete product (admin only)
+app.delete('/api/products/:id', async (req, res) => {
+    try {
+        const product = await Product.findOneAndDelete({ id: req.params.id });
+        if (!product) {
+            return res.status(404).json({ message: "Prodotto non trovato" });
+        }
+        res.json({ message: "Prodotto eliminato" });
+    } catch (error) {
+        res.status(500).json({ message: "Errore eliminazione prodotto" });
+    }
+});
+
+// Reset Products (delete all and re-seed)
+app.post('/api/admin/reset-products', async (req, res) => {
+    const { password } = req.body;
+    if (password !== 'Matty47ghigo231747#') {
+        return res.status(401).json({ message: "Password errata" });
+    }
+    
+    try {
+        await Product.deleteMany({});
+        
+        const defaultProducts = [
+            { id: 'creazione-sito-web', category: 'web-editing', title: 'Creazione Sito Web', description: 'Sito web moderno e responsivo creato da zero secondo le tue esigenze.', price: 'Da €299', priceValue: 299, features: ['Design personalizzato', 'Responsivo', 'SEO base', 'Supporto 1 mese'] },
+            { id: 'modernizzazione-sito', category: 'web-editing', title: 'Modernizzazione Sito Web', description: 'Rinnovo completo del tuo sito esistente.', price: 'Da €149', priceValue: 149, features: ['Restyling', 'Performance', 'Mobile'] },
+            { id: 'sitoweb-minecraft-rp', category: 'web-editing', title: 'Sito Web per Minecraft/Roleplay', description: 'Sito web dedicato a server Minecraft o community roleplay.', price: 'Da €199', priceValue: 199, features: ['Autenticazione', 'Store integrato', 'Status server live'] },
+            { id: 'bot-discord', category: 'bot', title: 'Bot Discord Personalizzato', description: 'Bot Discord su misura per le tue esigenze.', price: 'Da €49', priceValue: 49, features: ['Comandi personalizzati', 'Moderazione', 'Hosting 1 mese'] },
+            { id: 'bot-telegram', category: 'bot', title: 'Bot Telegram', description: 'Bot Telegram per automazione e gestione community.', price: 'Da €39', priceValue: 39, features: ['Comandi', 'Notifiche', 'Webhook'] },
+            { id: 'bot-minecraft', category: 'bot', title: 'Plugin Discord-MC', description: 'Bridge per collegare Minecraft con Discord.', price: 'Da €29', priceValue: 29, features: ['Chat sincronizzata', 'Rich presence'] },
+            { id: 'setup-database', category: 'settaggi', title: 'Configurazione Database', description: 'Setup completo di database MySQL, PostgreSQL o MongoDB.', price: 'Da €29', priceValue: 29, features: ['Installazione', 'Ottimizzazione', 'Backup'] },
+            { id: 'setup-discord-server', category: 'settaggi', title: 'Setup Discord Server', description: 'Configurazione completa del tuo server Discord.', price: 'Da €49', priceValue: 49, features: ['Canali personalizzati', 'Ruoli', 'Vanity URL'] },
+            { id: 'setup-vps', category: 'settaggi', title: 'Configurazione VPS', description: 'Setup e ottimizzazione VPS.', price: 'Da €59', priceValue: 59, features: ['SO installato', 'Firewall', 'SSL', 'Nginx'] },
+            { id: 'setup-web-server', category: 'settaggi', title: 'Setup Web Server', description: 'Configurazione web server Nginx o Apache.', price: 'Da €49', priceValue: 49, features: ['Server ottimizzato', 'SSL', 'Cache'] },
+            { id: 'setup-minecraft-server', category: 'settaggi', title: 'Setup Minecraft Server', description: 'Configurazione server Minecraft ottimizzato.', price: 'Da €39', priceValue: 39, features: ['Paper/Spigot', 'Plugins', 'Anti-lag'] },
+            { id: 'server-minecraft', category: 'server', title: 'Minecraft Server Hosting', description: 'Hosting server Minecraft con hardware dedicato.', price: '€5-25/mes', priceValue: 5, features: ['Hardware dedicato', 'DDoS protection', 'Backup'], plans: [{ name: 'Basic', slots: 10, price: '€5/mes' }, { name: 'Standard', slots: 25, price: '€10/mes' }, { name: 'Premium', slots: 50, price: '€20/mes' }, { name: 'Ultimate', slots: 100, price: '€25/mes' }] },
+            { id: 'server-discord', category: 'server', title: 'Discord Server Setup Pro', description: 'Servizio completo setup server Discord professionale.', price: 'Da €79', priceValue: 79, features: ['Design premium', 'Bot personalizzati', 'Gestione 1 mese'] },
+            { id: 'consulenza-sviluppo', category: 'consulenze', title: 'Consulenza Sviluppo Software', description: 'Sessione consulenza per progettazione software.', price: '€30/ora', priceValue: 30, features: ['Analisi requisiti', 'Code review', 'Documentazione'] },
+            { id: 'consulenza-infra', category: 'consulenze', title: 'Consulenza Infrastruttura IT', description: 'Consulenza su infrastrutture IT e sicurezza.', price: '€40/ora', priceValue: 40, features: ['Analisi', 'Cloud', 'Sicurezza'] },
+            { id: 'consulenza-gaming', category: 'consulenze', title: 'Consulenza Gaming Community', description: 'Consulenza per community gaming.', price: '€25/ora', priceValue: 25, features: ['Strategia', 'Setup tecnico', 'Monetizzazione'] }
+        ];
+        
+        await Product.insertMany(defaultProducts);
+        res.json({ message: `Prodotti resettati! ${defaultProducts.length} prodotti inseriti.` });
+    } catch (error) {
+        res.status(500).json({ message: "Errore durante il reset prodotti: " + error.message });
+    }
+});
+
+// Seed products (for initial setup)
+app.post('/api/products/seed', async (req, res) => {
+    try {
+        const defaultProducts = [
+            // Web Editing
+            {
+                id: 'creazione-sito-web',
+                category: 'web-editing',
+                title: 'Creazione Sito Web',
+                description: 'Sito web moderno e responsivo creato da zero secondo le tue esigenze. Include design personalizzato, ottimizzazione SEO e hosting iniziale.',
+                price: 'Da €299',
+                priceValue: 299,
+                features: ['Design personalizzato', 'Responsivo (mobile-friendly)', 'Ottimizzazione SEO base', 'Contatti email inclusi', '1 mese di supporto']
+            },
+            {
+                id: 'modernizzazione-sito',
+                category: 'web-editing',
+                title: 'Modernizzazione Sito Web',
+                description: 'Rinnovo completo del tuo sito esistente con design moderno, miglioramento delle performance e aggiornamento tecnologico.',
+                price: 'Da €149',
+                priceValue: 149,
+                features: ['Restyling grafico', 'Miglioramento performance', 'Ottimizzazione mobile', 'Aggiornamento contenuti', '6 mesi di manutenzione']
+            },
+            {
+                id: 'sitoweb-minecraft-rp',
+                category: 'web-editing',
+                title: 'Sito Web per Minecraft/Roleplay',
+                description: 'Sito web dedicato a server Minecraft o community roleplay con sistema autenticazione, store, forum e status del server.',
+                price: 'Da €199',
+                priceValue: 199,
+                features: ['Sistema autenticazione', 'Store integrato', 'Status server live', 'Forum community', 'Patchnotes automatiche']
+            },
+            // Bot
+            {
+                id: 'bot-discord',
+                category: 'bot',
+                title: 'Bot Discord Personalizzato',
+                description: 'Bot Discord su misura per le tue esigenze con comandi personalizzati, automazioni, moderazione e integrazioni.',
+                price: 'Da €49',
+                priceValue: 49,
+                features: ['Comandi personalizzati', 'Sistema moderazione', 'Logging avanzato', 'Integrazione API', 'Hosting incluso 1 mese']
+            },
+            {
+                id: 'bot-telegram',
+                category: 'bot',
+                title: 'Bot Telegram',
+                description: 'Bot Telegram per automazione, gestione community, notifiche e molto altro.',
+                price: 'Da €39',
+                priceValue: 39,
+                features: ['Comandi personalizzati', 'Notifiche automatiche', 'Gestione gruppi', 'Webhook integrations', 'Hosting incluso 1 mese']
+            },
+            {
+                id: 'bot-minecraft',
+                category: 'bot',
+                title: 'Plugin/Mod Discord-MC',
+                description: 'Bridge e plugin per collegare il tuo server Minecraft con Discord per chat cross-platform.',
+                price: 'Da €29',
+                priceValue: 29,
+                features: ['Chat sincronizzata', 'Rich presence', 'Notifiche eventi', 'Kill/death tracker', 'Compattibile with Spigot/Paper']
+            },
+            // Settaggi
+            {
+                id: 'setup-database',
+                category: 'settaggi',
+                title: 'Configurazione Database',
+                description: 'Setup completo di database MySQL, PostgreSQL o MongoDB ottimizzato per le tue applicazioni.',
+                price: 'Da €29',
+                priceValue: 29,
+                features: ['Installazione e configurazione', 'Ottimizzazione query', 'Backup automatizzati', 'Sicurezza avanzata', 'Documentazione']
+            },
+            {
+                id: 'setup-discord-server',
+                category: 'settaggi',
+                title: 'Setup Discord Server',
+                description: 'Configurazione completa del tuo server Discord con canali, ruoli, bot e automazioni.',
+                price: 'Da €49',
+                priceValue: 49,
+                features: ['Struttura canali personalizzata', 'Sistema ruoli', 'Widget server', 'Vanity URL', 'Server banner professionale']
+            },
+            {
+                id: 'setup-vps',
+                category: 'settaggi',
+                title: 'Configurazione VPS',
+                description: 'Setup e ottimizzazione VPS per hosting di applicazioni web, bot, game server e molto altro.',
+                price: 'Da €59',
+                priceValue: 59,
+                features: ['Installazione SO', 'Configurazione firewall', 'SSL/HTTPS', 'Reverse proxy (Nginx)', 'Performance tuning']
+            },
+            {
+                id: 'setup-web-server',
+                category: 'settaggi',
+                title: 'Setup Web Server',
+                description: 'Configurazione web server Nginx o Apache con ottimizzazioni per alte performance e sicurezza.',
+                price: 'Da €49',
+                priceValue: 49,
+                features: ['Server web ottimizzato', 'Configurazione SSL', 'Cache avanzata', 'Protezione DDoS base', 'Monitoraggio']
+            },
+            {
+                id: 'setup-minecraft-server',
+                category: 'settaggi',
+                title: 'Setup Minecraft Server',
+                description: 'Configurazione e ottimizzazione server Minecraft per performance ottimali e migliore esperienza di gioco.',
+                price: 'Da €39',
+                priceValue: 39,
+                features: ['Paper/Spigot setup', 'Ottimizzazione performance', 'Plugins essenziali', 'Backup automatici', 'Anti-lag tuning']
+            },
+            // Server
+            {
+                id: 'server-minecraft',
+                category: 'server',
+                title: 'Minecraft Server Hosting',
+                description: 'Hosting server Minecraft con hardware dedicato, uptime garantito e supporto tecnico specializzato.',
+                price: '€5-25/mes',
+                priceValue: 5,
+                features: ['Hardware dedicato', 'DDoS protection', 'Backup giornalieri', 'Slot espandibili', 'Supporto 24/7'],
+                plans: [
+                    { name: 'Basic', slots: 10, price: '€5/mes' },
+                    { name: 'Standard', slots: 25, price: '€10/mes' },
+                    { name: 'Premium', slots: 50, price: '€20/mes' },
+                    { name: 'Ultimate', slots: 100, price: '€25/mes' }
+                ]
+            },
+            {
+                id: 'server-discord',
+                category: 'server',
+                title: 'Discord Server Setup Pro',
+                description: 'Servizio completo di setup e gestione server Discord professionale per community grandi.',
+                price: 'Da €79',
+                priceValue: 79,
+                features: ['Design premium server', 'Bot personalizzati', 'Widget avanzati', 'Analytics community', '1 mese gestione inclusa']
+            },
+            // Consulenze
+            {
+                id: 'consulenza-sviluppo',
+                category: 'consulenze',
+                title: 'Consulenza Sviluppo Software',
+                description: 'Sessione di consulenza per progettazione software, architettura applicativa e best practices di sviluppo.',
+                price: '€30/ora',
+                priceValue: 30,
+                features: ['Analisi requisiti', 'Progettazione architettura', 'Code review', 'Consigli ottimizzazione', 'Documentazione tecnica']
+            },
+            {
+                id: 'consulenza-infra',
+                category: 'consulenze',
+                title: 'Consulenza Infrastruttura IT',
+                description: 'Consulenza su infrastrutture IT, server, cloud e sicurezza informatica per aziende e privati.',
+                price: '€40/ora',
+                priceValue: 40,
+                features: ['Analisi infrastruttura', 'Piano migrazione cloud', 'Sicurezza informatica', 'Cost optimization', 'Report dettagliato']
+            },
+            {
+                id: 'consulenza-gaming',
+                category: 'consulenze',
+                title: 'Consulenza Gaming Community',
+                description: 'Consulenza per community gaming su setup server, moderazione, engagement e monetizzazione.',
+                price: '€25/ora',
+                priceValue: 25,
+                features: ['Strategia community', 'Setup tecnico', 'Monetizzazione', 'Event planning', 'Growth strategy']
+            }
+        ];
+        
+        // Delete existing products
+        await Product.deleteMany({});
+        
+        // Insert new products
+        await Product.insertMany(defaultProducts);
+        
+        res.json({ message: 'Prodotti seeded con successo', count: defaultProducts.length });
+    } catch (error) {
+        console.error('Seed error:', error);
+        res.status(500).json({ message: "Errore durante il seed dei prodotti" });
+    }
 });
