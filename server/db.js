@@ -36,6 +36,7 @@ const UserSchema = new mongoose.Schema({
     tempAuthCodeExpires: Date,
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    stripeCustomerId: String,
     lastLogin: { type: Date, default: Date.now },
     createdAt: { type: Date, default: Date.now }
 });
@@ -56,15 +57,42 @@ const TicketSchema = new mongoose.Schema({
 });
 
 const OrderSchema = new mongoose.Schema({
+    orderNumber: { type: String, unique: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     items: [{
+        productId: { type: String, ref: 'Product' },
         name: String,
         price: Number,
-        image: String
+        quantity: { type: Number, default: 1 },
+        image: String,
+        options: { type: mongoose.Schema.Types.Mixed, default: {} }
     }],
+    billingInfo: {
+        firstName: String,
+        lastName: String,
+        fullName: String,
+        email: String,
+        phone: String,
+        company: String,
+        address: String,
+        city: String,
+        postalCode: String,
+        country: String,
+        vatNumber: String
+    },
+    paymentMethod: { type: String, enum: ['stripe', 'paypal', 'bank_transfer', 'pending'], default: 'pending' },
+    subtotal: Number,
+    discount: { type: Number, default: 0 },
+    couponCode: { type: String, default: null },
     total: Number,
-    status: { type: String, enum: ['paid', 'pending', 'cancelled'], default: 'pending' },
-    date: { type: Date, default: Date.now }
+    status: { type: String, enum: ['pending', 'processing', 'completed', 'cancelled'], default: 'pending' },
+    paymentId: String,
+    invoiceUrl: String,
+    notes: String,
+    expiresAt: Date,
+    completedAt: Date,
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
 });
 
 const StatsSchema = new mongoose.Schema({
@@ -150,7 +178,7 @@ async function seedProducts() {
             { id: 'consulenza-infra', category: 'consulenze', title: 'Consulenza Infrastruttura', description: 'Consulenza IT e sicurezza.', price: '€40/ora', priceValue: 40, features: ['Cloud', 'Sicurezza'] },
             { id: 'consulenza-gaming', category: 'consulenze', title: 'Consulenza Gaming', description: 'Per community gaming.', price: '€25/ora', priceValue: 25, features: ['Strategia', 'Monetizzazione'] }
         ];
-        
+
         const count = await Product.countDocuments();
         if (count === 0) {
             console.log('Seeding products...');
@@ -173,14 +201,14 @@ mongoose.connect(MONGODB_URI)
     })
     .catch(err => console.error('MongoDB connection error:', err));
 
-module.exports = { 
-    User, 
+module.exports = {
+    User,
     Ticket,
     Order,
-    Stats, 
+    Stats,
     AdminConfig,
     Product,
     getAdminStatus,
     incrementVisitors,
-    mongoose 
+    mongoose
 };

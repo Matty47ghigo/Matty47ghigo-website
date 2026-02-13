@@ -246,7 +246,12 @@ const Profile = () => {
                                 style={{ width: '4rem', height: '4rem', borderRadius: '50%', border: '2px solid white', padding: '0.25rem', overflow: 'hidden', cursor: 'pointer' }}
                                 onClick={() => document.getElementById('profilePictureInput').click()}
                             >
-                                <img src={profilePicture || user.picture || '/favicon.png'} alt="Profile" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                <img 
+                                    src={profilePicture || user.picture || '/favicon.png'} 
+                                    alt="Profile" 
+                                    referrerPolicy="no-referrer"
+                                    style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
+                                />
                             </div>
                             <button 
                                 onClick={() => document.getElementById('profilePictureInput').click()}

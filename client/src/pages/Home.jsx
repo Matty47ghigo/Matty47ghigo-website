@@ -573,7 +573,14 @@ const Home = () => {
           <Link to="/dashboard/support" className="btn-primary" style={{ width: 'auto', padding: '1.25rem 3.5rem', display: 'inline-flex', fontSize: '1.1rem' }}>Contattami</Link>
           
           <div style={{ marginTop: '8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '2rem' }}>
-            <div style={{ fontWeight: 900, fontSize: '0.9rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>matty47ghigo.studios</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ fontWeight: 900, fontSize: '0.9rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>matty47ghigo.studios</div>
+              <div style={{ fontSize: '0.65rem', color: 'var(--text-dim)' }}>
+                <Link to="/privacy" style={{ color: 'var(--text-dim)', textDecoration: 'none', marginRight: '1rem' }}>Privacy</Link>
+                <Link to="/refund" style={{ color: 'var(--text-dim)', textDecoration: 'none', marginRight: '1rem' }}>Reso</Link>
+                <Link to="/terms" style={{ color: 'var(--text-dim)', textDecoration: 'none' }}>Termini</Link>
+              </div>
+            </div>
             <div style={{ opacity: 0.3, fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.3em' }}>
               &copy; 2026 Matty47ghigo Studios. Crafted with Precision.
             </div>

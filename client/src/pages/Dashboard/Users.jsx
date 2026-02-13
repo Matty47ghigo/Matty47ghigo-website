@@ -68,7 +68,12 @@ const Users = () => {
                                         <td>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                                 <div style={{ position: 'relative' }}>
-                                                    <img src={user.picture || '/favicon.png'} alt="P" style={{ width: '2.5rem', height: '2.5rem', borderRadius: '50%', border: '1px solid var(--border-subtle)', objectFit: 'cover' }} />
+                                                    <img 
+                                                        src={user.picture || '/favicon.png'} 
+                                                        alt="P" 
+                                                        referrerPolicy="no-referrer"
+                                                        style={{ width: '2.5rem', height: '2.5rem', borderRadius: '50%', border: '1px solid var(--border-subtle)', objectFit: 'cover' }} 
+                                                    />
                                                     {user.isAdmin && (
                                                         <div style={{ position: 'absolute', top: '-0.25rem', right: '-0.25rem', background: '#ef4444', color: 'white', borderRadius: '50%', padding: '2px', border: '2px solid #000' }}>
                                                             <Shield size={10} />

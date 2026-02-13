@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const { OAuth2Client } = require('google-auth-library');
 const { User, Ticket, Order, Stats, AdminConfig, Product, getAdminStatus, incrementVisitors } = require('./db');
 const { sendVerificationEmail, sendTicketClosedEmail, sendAdminNotification, send2FACodeEmail } = require('./email');
+const shopRoutes = require('./shopRoutes');
 const { authenticator } = require('otplib');
 
 // Configure authenticator for better compatibility
@@ -30,7 +31,12 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
+
+// Stripe webhook needs raw body - must be before bodyParser.json()
+app.use('/api/shop/webhook/stripe', express.raw({ type: 'application/json' }));
+
 app.use(bodyParser.json());
+app.use('/api/shop', shopRoutes);
 
 // --- Middleware ---
 app.use(async (req, res, next) => {
@@ -423,11 +429,15 @@ app.post('/api/auth/discord', async (req, res) => {
              return res.status(400).json({ message: "Impossibile ottenere l'email da Discord. Assicurati di aver verificato l'email sul tuo account Discord." });
         }
 
+        const picture = userRes.data.avatar 
+            ? `https://cdn.discordapp.com/avatars/${userRes.data.id}/${userRes.data.avatar}.png`
+            : `https://cdn.discordapp.com/embed/avatars/${parseInt(userRes.data.id) % 5}.png`;
+
         const user = await upsertSocialUser({
             name: userRes.data.global_name || userRes.data.username,
             surname: '',
             email: userRes.data.email,
-            picture: `https://cdn.discordapp.com/avatars/${userRes.data.id}/${userRes.data.avatar}.png`,
+            picture: picture,
             provider: 'discord',
             externalId: userRes.data.id
         });

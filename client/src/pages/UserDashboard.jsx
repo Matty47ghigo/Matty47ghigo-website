@@ -27,6 +27,7 @@ const UserDashboard = () => {
                 <img 
                     src={user.picture} 
                     alt="User" 
+                    referrerPolicy="no-referrer"
                     style={{ width: '100px', height: '100px', borderRadius: '50%', marginBottom: '1.5rem', border: '3px solid var(--primary)' }} 
                 />
                 <h1 className="title">Benvenuto, {user.name}!</h1>

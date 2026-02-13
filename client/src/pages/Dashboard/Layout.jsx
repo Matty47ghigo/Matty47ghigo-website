@@ -11,7 +11,8 @@ import {
     X,
     Bell,
     BarChart3,
-    ShieldAlert
+    ShieldAlert,
+    Tag
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -24,6 +25,8 @@ import Support from './Support';
 import Users from './Users'; // Only for admin
 import Messages from './Messages'; // Only for admin
 import AdminStats from './AdminStats';
+import AdminCoupons from './AdminCoupons'; // Only for admin
+import AdminOrders from './AdminOrders'; // Only for admin
 import AdminDangerZone from './AdminDangerZone';
 
 const DashboardLayout = () => {
@@ -41,16 +44,19 @@ const DashboardLayout = () => {
         { name: 'Home', path: '/dashboard', icon: LayoutDashboard },
         { name: 'Profilo', path: '/dashboard/profile', icon: User },
         { name: 'Pagamenti', path: '/dashboard/payments', icon: CreditCard },
-        { name: 'Ordini', path: '/dashboard/orders', icon: ShoppingCart },
         { name: 'Assistenza', path: '/dashboard/support', icon: LifeBuoy },
     ];
 
     if (user.isAdmin) {
         navItems.push(
+            { name: 'Ordini Shop', path: '/dashboard/admin-orders', icon: ShoppingCart, adminOnly: true },
+            { name: 'Coupon', path: '/dashboard/coupons', icon: Tag, adminOnly: true },
             { name: 'Analytics', path: '/dashboard/stats', icon: BarChart3, adminOnly: true },
             { name: 'Utenti', path: '/dashboard/users', icon: User, adminOnly: true },
             { name: 'Danger Zone', path: '/dashboard/admin-danger', icon: ShieldAlert, adminOnly: true }
         );
+    } else {
+        navItems.splice(3, 0, { name: 'Ordini', path: '/dashboard/orders', icon: ShoppingCart });
     }
 
     return (
@@ -128,11 +134,12 @@ const DashboardLayout = () => {
                 <header className="main-header">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <img 
-    src={user.picture || 'https://ui-avatars.com/api/?name=' + (user.name || 'U') + '&background=00e5ff&color=000'}
-    alt="Profile" 
-    className="avatar" 
-    onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + (user.name || 'U') + '&background=00e5ff&color=000'; }}
-/>
+                            src={user.picture || 'https://ui-avatars.com/api/?name=' + (user.name || 'U') + '&background=00e5ff&color=000'}
+                            alt="Profile" 
+                            className="avatar" 
+                            referrerPolicy="no-referrer"
+                            onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + (user.name || 'U') + '&background=00e5ff&color=000'; }}
+                        />
                         <div>
                             <p style={{ fontSize: '0.875rem', fontWeight: 700 }}>{user.name} {user.surname}</p>
                             <p style={{ fontSize: '0.625rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
@@ -154,6 +161,8 @@ const DashboardLayout = () => {
                         <Route path="/support" element={<Support />} />
                         {user.isAdmin && (
                             <>
+                                <Route path="/admin-orders" element={<AdminOrders />} />
+                                <Route path="/coupons" element={<AdminCoupons />} />
                                 <Route path="/users" element={<Users />} />
                                 <Route path="/messages" element={<Messages />} />
                                 <Route path="/stats" element={<AdminStats />} />
