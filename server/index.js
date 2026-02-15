@@ -1271,3 +1271,11 @@ app.post('/api/products/seed', async (req, res) => {
         res.status(500).json({ message: "Errore durante il seed dei prodotti" });
     }
 });
+
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
+
+module.exports = app;

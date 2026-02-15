@@ -19,26 +19,34 @@ const NewsletterVerify = () => {
   useEffect(() => {
     const verify = async () => {
       if (!token) {
-        setStatus("error");
-        setMessage("Token di verifica mancante.");
+        if (status !== "error") {
+          setStatus("error");
+          setMessage("Token di verifica mancante.");
+        }
         return;
       }
 
       try {
         const res = await axios.get(`/api/newsletter/verify?token=${token}`);
-        setStatus("success");
-        setMessage(res.data.message);
+        if (status !== "success") {
+          setStatus("success");
+          setMessage(res.data.message);
+        }
       } catch (err) {
-        setStatus("error");
-        setMessage(
-          err.response?.data?.message ||
-            "Errore durante la verifica della newsletter.",
-        );
+        if (status !== "error") {
+          setStatus("error");
+          setMessage(
+            err.response?.data?.message ||
+              "Errore durante la verifica della newsletter.",
+          );
+        }
       }
     };
 
-    verify();
-  }, [token]);
+    if (status === "loading") {
+      verify();
+    }
+  }, [token, status]);
 
   return (
     <div
