@@ -116,7 +116,7 @@ app.get('/api/auth/verify', async (req, res) => {
             <div style="font-family: sans-serif; text-align: center; padding: 50px;">
                 <h1 style="color: #00e5ff;">Account Attivato! 🚀</h1>
                 <p>Il tuo account è stato verificato con successo. Ora puoi chiudere questa pagina e accedere al sito.</p>
-                <a href="http://localhost:5173/login" style="display: inline-block; padding: 10px 20px; background: #00e5ff; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold;">Accedi a Matty47ghigo</a>
+                <a href="https://matty47ghigo-website.vercel.app/login" style="display: inline-block; padding: 10px 20px; background: #00e5ff; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold;">Accedi a Matty47ghigo</a>
             </div>
         `);
     } catch (error) {
@@ -420,7 +420,7 @@ app.post('/api/auth/discord', async (req, res) => {
             client_secret: process.env.DISCORD_CLIENT_SECRET,
             grant_type: 'authorization_code',
             code,
-            redirect_uri: 'http://localhost:5173/callback'
+            redirect_uri: 'https://matty47ghigo-website.vercel.app/callback'
         }), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
 
         const userRes = await axios.get('https://discord.com/api/users/@me', {

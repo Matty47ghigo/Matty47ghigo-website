@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-const APP_URL = 'http://localhost:5173';
+const APP_URL = 'https://matty47ghigo-website.vercel.app';
 
 const sendVerificationEmail = async (email, name, token) => {
     const html = `

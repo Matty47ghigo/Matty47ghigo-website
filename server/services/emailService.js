@@ -45,12 +45,12 @@ const sendOrderConfirmation = async (order) => {
                     <div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #00d2ff;">
                         <h3 style="margin: 0 0 10px; font-size: 16px; color: #333;">Prossimi Passaggi:</h3>
                         <p style="margin: 0; font-size: 14px; color: #555; line-height: 1.6;">
-                            Per iniziare a lavorare sul tuo progetto, ti chiediamo gentilmente di <strong>aprire un ticket di assistenza</strong> nella tua <a href="${process.env.APP_URL || 'http://localhost:5173'}/dashboard/support" style="color: #3a7bd5; text-decoration: none;">dashboard personale</a> per spiegarci i dettagli e le tue esigenze.
+                            Per iniziare a lavorare sul tuo progetto, ti chiediamo gentilmente di <strong>aprire un ticket di assistenza</strong> nella tua <a href="${process.env.APP_URL || 'https://matty47ghigo-website.vercel.app'}/dashboard/support" style="color: #3a7bd5; text-decoration: none;">dashboard personale</a> per spiegarci i dettagli e le tue esigenze.
                         </p>
                     </div>
 
                     <div style="margin-top: 30px; text-align: center;">
-                        <a href="${process.env.APP_URL || 'http://localhost:5173'}/dashboard/orders" style="background-color: #333; color: white; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: bold; display: inline-block;">Visualizza Ordine</a>
+                        <a href="${process.env.APP_URL || 'https://matty47ghigo-website.vercel.app'}/dashboard/orders" style="background-color: #333; color: white; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: bold; display: inline-block;">Visualizza Ordine</a>
                     </div>
                 </div>
                 
