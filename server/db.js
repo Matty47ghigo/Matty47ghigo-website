@@ -91,6 +91,7 @@ const OrderSchema = new mongoose.Schema({
     notes: String,
     expiresAt: Date,
     completedAt: Date,
+    emailSent: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });

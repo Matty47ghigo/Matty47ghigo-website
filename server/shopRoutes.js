@@ -11,6 +11,17 @@ const { sendOrderConfirmation } = require('./services/emailService');
 const payPalService = require('./services/payPalService');
 
 // Helper to get or create Stripe customer
+const finalizeOrder = async (order) => {
+    if (order.status === 'completed' && !order.emailSent) {
+        console.log(`Sending confirmation email for order ${order.orderNumber}`);
+        const result = await sendOrderConfirmation(order);
+        if (result.success) {
+            order.emailSent = true;
+            await order.save();
+        }
+    }
+};
+
 const getOrCreateStripeCustomer = async (userId, billingInfo) => {
     if (!userId) return null;
 
@@ -315,7 +326,7 @@ router.post('/paypal/create-order', async (req, res) => {
             await order.save();
 
             // Send confirmation email
-            await sendOrderConfirmation(order);
+            await finalizeOrder(order);
 
             res.json({
                 id: 'FREE_ORDER',
@@ -345,7 +356,7 @@ router.post('/paypal/capture-order', async (req, res) => {
 
             if (order) {
                 console.log(`Finalizing PayPal order ${order.orderNumber}`);
-                await sendOrderConfirmation(order);
+                await finalizeOrder(order);
             }
 
             res.json(captureData);
@@ -396,9 +407,8 @@ router.get('/checkout/verify-session/:sessionId', async (req, res) => {
 
             if (order && order.status === 'completed') {
                 // Send confirmation email if not already sent
-                // (Using metadata to prevent duplicate emails if possible or just log)
                 console.log(`Finalizing order ${order.orderNumber} via success page verification`);
-                await sendOrderConfirmation(order);
+                await finalizeOrder(order);
             }
         }
 
@@ -441,12 +451,16 @@ router.post('/webhook/stripe', express.raw({ type: 'application/json' }), async 
             const orderId = session.metadata?.orderId;
 
             if (orderId) {
-                await Order.findByIdAndUpdate(orderId, {
+                const order = await Order.findByIdAndUpdate(orderId, {
                     status: 'completed',
                     paymentId: session.payment_intent || session.subscription,
                     completedAt: new Date()
-                });
-                console.log(`Order ${orderId} marked as completed (Event: ${event.type})`);
+                }, { new: true });
+
+                if (order) {
+                    console.log(`Order ${order.orderNumber} marked as completed (Event: ${event.type})`);
+                    await finalizeOrder(order);
+                }
             }
             break;
 
