@@ -127,6 +127,21 @@ const ProductSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
+const NewsletterSchema = new mongoose.Schema({
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    isVerified: { type: Boolean, default: false },
+    verificationToken: String,
+    subscribedAt: { type: Date, default: Date.now }
+});
+
+const NewsletterPostSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    content: { type: String, required: true },
+    status: { type: String, enum: ['draft', 'sent'], default: 'draft' },
+    sentAt: Date,
+    createdAt: { type: Date, default: Date.now }
+});
+
 // --- Models ---
 
 const User = mongoose.model('User', UserSchema);
@@ -135,6 +150,8 @@ const Order = mongoose.model('Order', OrderSchema);
 const Stats = mongoose.model('Stats', StatsSchema);
 const AdminConfig = mongoose.model('AdminConfig', AdminConfigSchema);
 const Product = mongoose.model('Product', ProductSchema);
+const Newsletter = mongoose.model('Newsletter', NewsletterSchema);
+const NewsletterPost = mongoose.model('NewsletterPost', NewsletterPostSchema);
 
 // --- Helpers ---
 
@@ -208,6 +225,8 @@ module.exports = {
     Stats,
     AdminConfig,
     Product,
+    Newsletter,
+    NewsletterPost,
     getAdminStatus,
     incrementVisitors,
     mongoose

@@ -138,7 +138,7 @@ const send2FACodeEmail = async (email, name, code) => {
 
 const sendPasswordResetEmail = async (email, name, token) => {
     const resetUrl = `${APP_URL}/reset-password?token=${token}`;
-    
+
     const html = `
     <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; background-color: #ffffff;">
         <div style="background-color: #050505; padding: 25px; text-align: center;">
@@ -167,10 +167,104 @@ const sendPasswordResetEmail = async (email, name, token) => {
     });
 };
 
+const sendNewsletterVerificationEmail = async (email, token) => {
+    const html = `
+    <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;">
+        <div style="background: #050505; padding: 32px 20px; text-align: center;">
+            <h1 style="color: #00e5ff; margin: 0; font-size: 26px; font-weight: 800;">NEWSLETTER ACTIVATION</h1>
+        </div>
+        <div style="padding: 40px; text-align: center;">
+            <h2 style="color: #050505; margin-bottom: 20px;">Un regalo ti aspetta! 🎁</h2>
+            <p style="color: #475569; font-size: 16px; line-height: 1.6;">Conferma la tua iscrizione alla newsletter di Matty47ghigo Studios per ricevere immediatamente un <b>codice sconto da 30€</b> da utilizzare sul nostro store!</p>
+            <div style="margin: 35px 0;">
+                <a href="${APP_URL}/newsletter-verify?token=${token}" style="display: inline-block; padding: 16px 36px; background-color: #00e5ff; color: #050505; text-decoration: none; border-radius: 50px; font-weight: 800; font-size: 16px; box-shadow: 0 10px 15px -3px rgba(0, 229, 255, 0.3);">Conferma e Ricevi lo Sconto</a>
+            </div>
+            <p style="font-size: 12px; color: #94a3b8;">Se non hai richiesto tu l'iscrizione, puoi ignorare questa email.</p>
+        </div>
+    </div>
+    `;
+
+    await transporter.sendMail({
+        from: '"Matty47ghigo Studios" <business.matty47ghigo@gmail.com>',
+        to: email,
+        subject: 'Conferma la tua iscrizione (Sconto 30€ Inside! 🎁)',
+        html
+    });
+};
+
+const sendNewsletterWelcomeEmail = async (email) => {
+    const html = `
+    <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;">
+        <div style="background: #050505; padding: 32px 20px; text-align: center;">
+            <h1 style="color: #00e5ff; margin: 0; font-size: 26px; font-weight: 800;">BENVENUTO NELLO STUDIO</h1>
+        </div>
+        <div style="padding: 40px; text-align: center;">
+            <h2 style="color: #050505; margin-bottom: 10px;">Iscrizione Confermata!</h2>
+            <p style="color: #475569; margin-bottom: 30px;">Grazie per esserti unito alla nostra community. Ecco il tuo regalo di benvenuto:</p>
+            
+            <div style="background: #f8fafc; padding: 30px; border-radius: 12px; border: 2px dashed #00e5ff; margin-bottom: 30px;">
+                <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Il tuo codice sconto</p>
+                <h3 style="margin: 0; font-size: 42px; font-weight: 900; color: #050505; letter-spacing: 2px;">SCONTO30</h3>
+            </div>
+            
+            <p style="color: #475569; margin-bottom: 30px;">Utilizza questo codice al checkout per ottenere <b>30€ di sconto</b> su qualsiasi servizio o prodotto dello store.</p>
+            
+            <a href="${APP_URL}/shop" style="display: inline-block; padding: 14px 32px; background-color: #050505; color: #ffffff; text-decoration: none; border-radius: 12px; font-weight: 700;">Vai allo Shop</a>
+        </div>
+        <div style="background-color: #f1f5f9; padding: 20px; text-align: center; font-size: 11px; color: #94a3b8;">
+            © 2026 Matty47ghigo Studios. Professional Web Development.
+        </div>
+    </div>
+    `;
+
+    await transporter.sendMail({
+        from: '"Matty47ghigo Studios" <business.matty47ghigo@gmail.com>',
+        to: email,
+        subject: 'Benvenuto! Ecco il tuo sconto di 30€ 🎁',
+        html
+    });
+};
+
+const sendNewsletterPostEmail = async (email, title, content) => {
+    const html = `
+    <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; background-color: #ffffff;">
+        <div style="background: #050505; padding: 32px 20px; text-align: center;">
+            <h1 style="color: #00e5ff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">Matty47ghigo Studios News</h1>
+        </div>
+        <div style="padding: 40px; color: #1e293b;">
+            <h2 style="color: #050505; margin-top: 0; font-size: 22px; border-bottom: 3px solid #00e5ff; padding-bottom: 10px; display: inline-block;">${title}</h2>
+            <div style="margin-top: 25px; line-height: 1.7; font-size: 16px;">
+                ${content}
+            </div>
+            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #f1f5f9; text-align: center;">
+                <p style="font-size: 14px; color: #94a3b8;">Restiamo in contatto per i prossimi aggiornamenti!</p>
+                <div style="margin-top: 15px;">
+                    <a href="${APP_URL}" style="color: #00e5ff; font-weight: 700; text-decoration: none;">Visita il Sito</a>
+                </div>
+            </div>
+        </div>
+        <div style="background-color: #f8fafc; padding: 20px; text-align: center; font-size: 11px; color: #94a3b8;">
+            Ricevi questa email perché sei iscritto alla newsletter di Matty47ghigo Studios.<br>
+            © 2026 Matty47ghigo Studios
+        </div>
+    </div>
+    `;
+
+    await transporter.sendMail({
+        from: '"Matty47ghigo Studios" <business.matty47ghigo@gmail.com>',
+        to: email,
+        subject: title,
+        html
+    });
+};
+
 module.exports = {
     sendVerificationEmail,
     sendTicketClosedEmail,
     sendAdminNotification,
     send2FACodeEmail,
-    sendPasswordResetEmail
+    sendPasswordResetEmail,
+    sendNewsletterVerificationEmail,
+    sendNewsletterWelcomeEmail,
+    sendNewsletterPostEmail
 };

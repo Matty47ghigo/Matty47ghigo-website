@@ -8,6 +8,7 @@ const { OAuth2Client } = require('google-auth-library');
 const { User, Ticket, Order, Stats, AdminConfig, Product, getAdminStatus, incrementVisitors } = require('./db');
 const { sendVerificationEmail, sendTicketClosedEmail, sendAdminNotification, send2FACodeEmail } = require('./email');
 const shopRoutes = require('./shopRoutes');
+const newsletterRoutes = require('./newsletterRoutes');
 const { authenticator } = require('otplib');
 
 // Configure authenticator for better compatibility
@@ -37,6 +38,7 @@ app.use('/api/shop/webhook/stripe', express.raw({ type: 'application/json' }));
 
 app.use(bodyParser.json());
 app.use('/api/shop', shopRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 
 // --- Middleware ---
 app.use(async (req, res, next) => {
@@ -51,9 +53,9 @@ app.use(async (req, res, next) => {
 
 // Debug route for time sync (essential for TOTP)
 app.get('/api/auth/time', (req, res) => {
-    res.json({ 
-        serverTime: Date.now(), 
-        timeOffset: new Date().getTimezoneOffset() 
+    res.json({
+        serverTime: Date.now(),
+        timeOffset: new Date().getTimezoneOffset()
     });
 });
 
@@ -131,7 +133,7 @@ app.post('/api/auth/login', async (req, res) => {
 
         if (user.provider === 'standard') {
             if (!user.isVerified) return res.status(403).json({ message: "Si prega di verificare l'email prima di accedere" });
-            
+
             const isMatch = await bcrypt.compare(password, user.passwordHash);
             if (!isMatch) return res.status(401).json({ message: "Credenziali non valide" });
         } else {
@@ -140,8 +142,8 @@ app.post('/api/auth/login', async (req, res) => {
 
         const result = await handleTwoFactorCheck(user);
         if (result.requires2FA) {
-            return res.json({ 
-                message: "2FA_REQUIRED", 
+            return res.json({
+                message: "2FA_REQUIRED",
                 userId: result.userId,
                 tempId: result.tempId
             });
@@ -172,7 +174,7 @@ app.post('/api/auth/2fa/login-verify', async (req, res) => {
         if (isBackup) {
             user.twoFactorBackupCodes = user.twoFactorBackupCodes.filter(c => c !== token.toUpperCase());
         }
-        
+
         // Clear temp email code if used
         user.tempAuthCode = undefined;
         user.tempAuthCodeExpires = undefined;
@@ -204,21 +206,21 @@ const handleTwoFactorCheck = async (user) => {
 // Social Auth Upsert Helper
 const upsertSocialUser = async (profile) => {
     const isAdmin = profile.email === 'mattiaghigo60@gmail.com';
-    
+
     // Find user by email
     let user = await User.findOne({ email: profile.email });
-    
+
     if (user) {
         // If user exists, ensure they are verified and update their profile picture/last login
         user.isVerified = true;
         user.lastLogin = new Date();
         user.isAdmin = isAdmin; // Update admin status based on email
         user.picture = profile.picture || user.picture;
-        
+
         // Add to linked accounts if not already there
         if (!user.linkedAccounts) user.linkedAccounts = {};
         user.linkedAccounts[profile.provider] = profile.externalId || 'linked';
-        
+
         // If this is a primary login (not a linking action), we might update the default provider
         // but normally we keep the first one or the most recent.
         await user.save();
@@ -226,7 +228,7 @@ const upsertSocialUser = async (profile) => {
     }
 
     // New user
-    const newUser = await User.create({ 
+    const newUser = await User.create({
         name: profile.name,
         surname: profile.surname || '',
         email: profile.email,
@@ -268,7 +270,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
         }
 
         if (user.provider !== 'standard' && !user.passwordHash) {
-             return res.json({ message: "Questo account utilizza il login social. Accedi con Google/Discord/GitHub." });
+            return res.json({ message: "Questo account utilizza il login social. Accedi con Google/Discord/GitHub." });
         }
 
         const token = crypto.randomBytes(32).toString('hex');
@@ -290,7 +292,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 app.post('/api/auth/reset-password', async (req, res) => {
     const { token, newPassword } = req.body;
     try {
-        const user = await User.findOne({ 
+        const user = await User.findOne({
             resetPasswordToken: token,
             resetPasswordExpires: { $gt: Date.now() }
         });
@@ -350,8 +352,8 @@ app.post('/api/auth/google', async (req, res) => {
 
         const result = await handleTwoFactorCheck(user);
         if (result.requires2FA) {
-            return res.json({ 
-                message: "2FA_REQUIRED", 
+            return res.json({
+                message: "2FA_REQUIRED",
                 userId: result.userId,
                 tempId: result.tempId
             });
@@ -394,8 +396,8 @@ app.post('/api/auth/github', async (req, res) => {
 
         const result = await handleTwoFactorCheck(user);
         if (result.requires2FA) {
-            return res.json({ 
-                message: "2FA_REQUIRED", 
+            return res.json({
+                message: "2FA_REQUIRED",
                 userId: result.userId,
                 tempId: result.tempId
             });
@@ -426,10 +428,10 @@ app.post('/api/auth/discord', async (req, res) => {
         });
 
         if (!userRes.data.email) {
-             return res.status(400).json({ message: "Impossibile ottenere l'email da Discord. Assicurati di aver verificato l'email sul tuo account Discord." });
+            return res.status(400).json({ message: "Impossibile ottenere l'email da Discord. Assicurati di aver verificato l'email sul tuo account Discord." });
         }
 
-        const picture = userRes.data.avatar 
+        const picture = userRes.data.avatar
             ? `https://cdn.discordapp.com/avatars/${userRes.data.id}/${userRes.data.avatar}.png`
             : `https://cdn.discordapp.com/embed/avatars/${parseInt(userRes.data.id) % 5}.png`;
 
@@ -444,8 +446,8 @@ app.post('/api/auth/discord', async (req, res) => {
 
         const result = await handleTwoFactorCheck(user);
         if (result.requires2FA) {
-            return res.json({ 
-                message: "2FA_REQUIRED", 
+            return res.json({
+                message: "2FA_REQUIRED",
                 userId: result.userId,
                 tempId: result.tempId
             });
@@ -463,13 +465,13 @@ app.post('/api/auth/discord', async (req, res) => {
 const summarizeText = (text) => {
     // Advanced AI-like summarization
     const keywords = ['errore', 'problema', 'bug', 'crash', 'pagamento', 'account', 'login', 'email', 'ticket', 'ordine', 'impossibile', 'non funziona', 'aiuto', 'domanda'];
-    
+
     // Clean text and extract potential topic
     const cleanText = text.replace(/[^\w\s]/gi, '').toLowerCase();
     let foundKeyword = keywords.find(k => cleanText.includes(k));
-    
+
     let summary = '';
-    
+
     if (foundKeyword) {
         summary += foundKeyword.charAt(0).toUpperCase() + foundKeyword.slice(1);
     } else {
@@ -484,7 +486,7 @@ const summarizeText = (text) => {
         const firstSentence = text.split(/[.!?]/)[0];
         summary += `: ${firstSentence.substring(0, 30)}${firstSentence.length > 30 ? '...' : ''}`;
     }
-    
+
     return summary;
 };
 
@@ -516,9 +518,9 @@ app.post('/api/tickets', async (req, res) => {
                 date: new Date()
             }]
         });
-        
+
         await ticket.populate('messages.senderId', 'name picture'); // Populate for immediate return
-        
+
         const user = await User.findById(userId);
         await sendAdminNotification(user.name, subject, problem, ticket._id);
         res.json(ticket);
@@ -577,7 +579,7 @@ app.patch('/api/users/:id', async (req, res) => {
         if (name !== undefined) updateData.name = name;
         if (surname !== undefined) updateData.surname = surname;
         if (email !== undefined) updateData.email = email;
-        
+
         const user = await User.findByIdAndUpdate(req.params.id, updateData, { new: true });
         if (!user) return res.status(404).json({ message: "Utente non trovato" });
         res.json(user);
@@ -601,7 +603,7 @@ app.post('/api/tickets/:id/message', async (req, res) => {
             content,
             date: new Date()
         });
-        
+
         if (role === 'user') {
             ticket.status = 'open';
         } else if (role === 'admin') {
@@ -629,7 +631,7 @@ app.patch('/api/tickets/:id', async (req, res) => {
 
         await ticket.save();
         await ticket.populate('messages.senderId', 'name picture'); // Populate for return
-        
+
         if (status === 'closed') {
             const user = await User.findById(ticket.userId);
             if (user && user.email) {
@@ -646,14 +648,14 @@ app.patch('/api/tickets/:id', async (req, res) => {
 // Get Recent Feedback (for admin dashboard)
 app.get('/api/feedback/recent', async (req, res) => {
     try {
-        const feedbackTickets = await Ticket.find({ 
+        const feedbackTickets = await Ticket.find({
             rating: { $ne: null },
             feedbackComment: { $ne: null, $ne: '' }
         })
-        .populate('userId', 'name picture')
-        .sort({ createdAt: -1 })
-        .limit(5);
-        
+            .populate('userId', 'name picture')
+            .sort({ createdAt: -1 })
+            .limit(5);
+
         res.json(feedbackTickets);
     } catch (error) {
         console.error("Feedback fetch error:", error);
@@ -688,7 +690,7 @@ app.post('/api/users/:id/payments', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ message: "Utente non trovato" });
-        
+
         const newMethod = { type, last4, brand };
         user.paymentMethods.push(newMethod);
         await user.save();
@@ -702,7 +704,7 @@ app.delete('/api/users/:id/payments/:paymentId', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ message: "Utente non trovato" });
-        
+
         user.paymentMethods = user.paymentMethods.filter(m => m._id.toString() !== req.params.paymentId);
         await user.save();
         res.json(user.paymentMethods);
@@ -723,7 +725,7 @@ app.post('/api/admin/reset', async (req, res) => {
     try {
         await Ticket.deleteMany({});
         await Order.deleteMany({});
-        
+
         // Reset stats
         let stats = await Stats.findOne();
         if (stats) {
@@ -780,7 +782,7 @@ app.post('/api/admin/hard-reset', async (req, res) => {
         await Product.deleteMany({});
         // Delete all users EXCEPT the primary admin
         await User.deleteMany({ email: { $ne: 'mattiaghigo60@gmail.com' } });
-        
+
         // Reset stats
         let stats = await Stats.findOne();
         if (stats) {
@@ -838,7 +840,7 @@ app.post('/api/auth/2fa/verify', async (req, res) => {
         // Verify using authenticator
         // authenticator.verify uses the options.window defined globally
         const isValid = authenticator.check(cleanToken, user.twoFactorSecret);
-        
+
         if (!isValid) {
             return res.status(400).json({ message: "Codice non valido. Verifica che l'ora del dispositivo sia sincronizzata con Internet." });
         }
@@ -887,13 +889,13 @@ app.post('/api/auth/2fa/send-email-code', async (req, res) => {
 
         // Generate 6-digit code
         const code = Math.floor(100000 + Math.random() * 900000).toString();
-        
+
         user.tempAuthCode = code;
         user.tempAuthCodeExpires = Date.now() + 5 * 60 * 1000; // 5 minutes
         await user.save();
 
         await send2FACodeEmail(user.email, user.name, code);
-        
+
         res.json({ message: "Codice inviato via email. Verifica la tua casella di posta." });
     } catch (error) {
         console.error("Send 2FA Email Error:", error);
@@ -905,7 +907,7 @@ app.get('/api/stats', async (req, res) => {
     try {
         let stats = await Stats.findOne();
         if (!stats) stats = await Stats.create({});
-        
+
         // Basic Stats
         stats.registeredUsers = await User.countDocuments();
         stats.orders = await Order.countDocuments();
@@ -917,7 +919,7 @@ app.get('/api/stats', async (req, res) => {
             { $match: { rating: { $exists: true } } },
             { $group: { _id: "$rating", count: { $sum: 1 } } }
         ]);
-        
+
         const ratings = [5, 4, 3, 2, 1].map(r => ({
             name: `${r} Stelle`,
             value: (ratingAgg.find(a => a._id === r) || { count: 0 }).count
@@ -942,11 +944,11 @@ app.get('/api/stats', async (req, res) => {
 
         const activityAgg = await Ticket.aggregate([
             { $match: { createdAt: { $gte: startOfPeriod } } },
-            { 
-                $group: { 
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, 
-                    count: { $sum: 1 } 
-                } 
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    count: { $sum: 1 }
+                }
             }
         ]);
 
@@ -975,7 +977,7 @@ app.get('/api/users/:id/stats', async (req, res) => {
         const ticketsCount = await Ticket.countDocuments({ userId, status: { $ne: 'closed' } });
         const user = await User.findById(userId);
         const paymentsCount = user?.paymentMethods?.length || 0;
-        
+
         res.json({
             orders: ordersCount,
             tickets: ticketsCount,
@@ -1066,10 +1068,10 @@ app.post('/api/admin/reset-products', async (req, res) => {
     if (password !== 'Matty47ghigo231747#') {
         return res.status(401).json({ message: "Password errata" });
     }
-    
+
     try {
         await Product.deleteMany({});
-        
+
         const defaultProducts = [
             { id: 'creazione-sito-web', category: 'web-editing', title: 'Creazione Sito Web', description: 'Sito web moderno e responsivo creato da zero secondo le tue esigenze.', price: 'Da €299', priceValue: 299, features: ['Design personalizzato', 'Responsivo', 'SEO base', 'Supporto 1 mese'] },
             { id: 'modernizzazione-sito', category: 'web-editing', title: 'Modernizzazione Sito Web', description: 'Rinnovo completo del tuo sito esistente.', price: 'Da €149', priceValue: 149, features: ['Restyling', 'Performance', 'Mobile'] },
@@ -1088,7 +1090,7 @@ app.post('/api/admin/reset-products', async (req, res) => {
             { id: 'consulenza-infra', category: 'consulenze', title: 'Consulenza Infrastruttura IT', description: 'Consulenza su infrastrutture IT e sicurezza.', price: '€40/ora', priceValue: 40, features: ['Analisi', 'Cloud', 'Sicurezza'] },
             { id: 'consulenza-gaming', category: 'consulenze', title: 'Consulenza Gaming Community', description: 'Consulenza per community gaming.', price: '€25/ora', priceValue: 25, features: ['Strategia', 'Setup tecnico', 'Monetizzazione'] }
         ];
-        
+
         await Product.insertMany(defaultProducts);
         res.json({ message: `Prodotti resettati! ${defaultProducts.length} prodotti inseriti.` });
     } catch (error) {
@@ -1256,13 +1258,13 @@ app.post('/api/products/seed', async (req, res) => {
                 features: ['Strategia community', 'Setup tecnico', 'Monetizzazione', 'Event planning', 'Growth strategy']
             }
         ];
-        
+
         // Delete existing products
         await Product.deleteMany({});
-        
+
         // Insert new products
         await Product.insertMany(defaultProducts);
-        
+
         res.json({ message: 'Prodotti seeded con successo', count: defaultProducts.length });
     } catch (error) {
         console.error('Seed error:', error);

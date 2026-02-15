@@ -38,6 +38,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Privacy from "./pages/Privacy";
 import Refund from "./pages/Refund";
 import Terms from "./pages/Terms";
+import NewsletterVerify from "./pages/NewsletterVerify";
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/verify" element={<Verify />} />
           <Route path="/feedback" element={<Feedback />} />
+          <Route path="/newsletter-verify" element={<NewsletterVerify />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/admin" element={<Login />} />
