@@ -246,9 +246,9 @@ const Home = () => {
               textTransform: "lowercase",
             }}
           >
-            matty47ghigo
+            Matty47ghigo
             <span style={{ color: "var(--text-dim)", fontWeight: 500 }}>
-              .studios
+              Studios
             </span>
           </div>
         </div>
@@ -633,8 +633,10 @@ const Home = () => {
               lineHeight: 1.7,
             }}
           >
-            Matty47ghigo Studios progetta e sviluppa infrastrutture digitali ad
-            alte prestazioni con un focus ossessivo su design e scalabilità.
+            <strong>Matty47ghigo Studios</strong> è una piattaforma
+            professionale dedicata alla progettazione e allo sviluppo di
+            infrastrutture digitali su misura, dai siti web ad alte prestazioni
+            ai bot Discord e consulenze software avanzate.
           </motion.p>
 
           <motion.div

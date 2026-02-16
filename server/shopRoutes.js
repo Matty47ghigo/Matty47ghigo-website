@@ -428,9 +428,11 @@ router.get('/checkout/verify-session/:sessionId', async (req, res) => {
 });
 
 // Stripe Webhook Handler
-router.post('/webhook/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+router.post('/webhook/stripe', async (req, res) => {
     const sig = req.headers['stripe-signature'];
     let event;
+
+    console.log('Received Stripe Webhook. Signature present:', !!sig);
 
     try {
         event = stripe.webhooks.constructEvent(

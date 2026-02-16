@@ -34,9 +34,16 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 
 // Stripe webhook needs raw body - must be before bodyParser.json()
-app.use('/api/shop/webhook/stripe', express.raw({ type: 'application/json' }));
+app.use(['/api/shop/webhook/stripe', '/api/webhook/stripe'], express.raw({ type: 'application/json' }));
 
 app.use(bodyParser.json());
+
+// Support both Stripe webhook URL patterns (with and without /shop)
+app.post('/api/webhook/stripe', (req, res, next) => {
+    req.url = '/webhook/stripe';
+    next();
+}, shopRoutes);
+
 app.use('/api/shop', shopRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 
