@@ -246,9 +246,9 @@ const Home = () => {
               textTransform: "none",
             }}
           >
-            Matty47ghigo
+            Matty Studios
             <span style={{ color: "var(--text-dim)", fontWeight: 500 }}>
-              Studios
+              TECH
             </span>
           </div>
         </div>
@@ -633,10 +633,10 @@ const Home = () => {
               lineHeight: 1.7,
             }}
           >
-            <strong>Matty47ghigo Studios</strong> è una piattaforma
-            professionale dedicata alla progettazione e allo sviluppo di
-            infrastrutture digitali su misura, dai siti web ad alte prestazioni
-            ai bot Discord e consulenze software avanzate.
+            <strong>Matty Studios TECH</strong> è una piattaforma professionale
+            dedicata alla progettazione e allo sviluppo di infrastrutture
+            digitali su misura, dai siti web ad alte prestazioni ai bot Discord
+            e consulenze software avanzate.
           </motion.p>
 
           <motion.div
@@ -698,7 +698,7 @@ const Home = () => {
               style={{ fontSize: "2rem", marginBottom: "1.5rem" }}
             >
               Lo Scopo di{" "}
-              <span className="text-gradient">Matty47ghigo Studios</span>
+              <span className="text-gradient">Matty Studios TECH</span>
             </h2>
             <div
               style={{
@@ -708,9 +708,9 @@ const Home = () => {
               }}
             >
               <p style={{ marginBottom: "1.5rem" }}>
-                <strong>Matty47ghigo Studios</strong> è una vetrina
-                professionale e una piattaforma di servizi digitali. Questo sito
-                permette ai nostri clienti di:
+                <strong>Matty Studios TECH</strong> è una vetrina professionale
+                e una piattaforma di servizi digitali. Questo sito permette ai
+                nostri clienti di:
               </p>
               <ul
                 style={{
@@ -1322,7 +1322,7 @@ const Home = () => {
                   textTransform: "uppercase",
                 }}
               >
-                Matty47ghigo Studios
+                Matty Studios TECH
               </div>
               <div style={{ fontSize: "0.65rem", color: "var(--text-dim)" }}>
                 <Link
@@ -1362,7 +1362,7 @@ const Home = () => {
                 letterSpacing: "0.3em",
               }}
             >
-              &copy; 2026 Matty47ghigo Studios. Crafted with Precision.
+              &copy; 2026 Matty Studios TECH. Crafted with Precision.
             </div>
             <div style={{ display: "flex", gap: "1.5rem" }}>
               <Github size={18} style={{ opacity: 0.5 }} />
