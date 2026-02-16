@@ -634,7 +634,9 @@ const Home = () => {
             }}
           >
             Matty47ghigo Studios progetta e sviluppa infrastrutture digitali ad
-            alte prestazioni con un focus ossessivo su design e scalabilità.
+            alte prestazioni. Utilizziamo l'accesso sicuro per permettere ai
+            clienti di monitorare ordini, servizi e ticket di supporto in tempo
+            reale.
           </motion.p>
 
           <motion.div
@@ -1248,7 +1250,7 @@ const Home = () => {
                   textTransform: "uppercase",
                 }}
               >
-                matty47ghigo.studios
+                Matty47ghigo Studios
               </div>
               <div style={{ fontSize: "0.65rem", color: "var(--text-dim)" }}>
                 <Link
