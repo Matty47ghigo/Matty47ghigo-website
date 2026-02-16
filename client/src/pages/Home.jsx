@@ -243,12 +243,12 @@ const Home = () => {
               fontWeight: 900,
               fontSize: "1.4rem",
               letterSpacing: "-1.5px",
-              textTransform: "none",
+              textTransform: "lowercase",
             }}
           >
-            Matty Studios
+            matty47ghigo
             <span style={{ color: "var(--text-dim)", fontWeight: 500 }}>
-              TECH
+              .studios
             </span>
           </div>
         </div>
@@ -318,7 +318,7 @@ const Home = () => {
                 fontSize: "0.8rem",
               }}
             >
-              Area Riservata
+              Accesso Platform
             </button>
 
             {showAccessMenu && (
@@ -349,7 +349,7 @@ const Home = () => {
                     letterSpacing: "0.2em",
                   }}
                 >
-                  Sistema di Accesso
+                  Security Gate
                 </div>
                 <div
                   style={{
@@ -521,7 +521,7 @@ const Home = () => {
                   letterSpacing: "0.1em",
                 }}
               >
-                Dashboard Utente
+                Accesso Platform
               </button>
 
               <GoogleLogin
@@ -633,10 +633,8 @@ const Home = () => {
               lineHeight: 1.7,
             }}
           >
-            <strong>Matty Studios TECH</strong> è una piattaforma professionale
-            dedicata alla progettazione e allo sviluppo di infrastrutture
-            digitali su misura, dai siti web ad alte prestazioni ai bot Discord
-            e consulenze software avanzate.
+            Matty47ghigo Studios progetta e sviluppa infrastrutture digitali ad
+            alte prestazioni con un focus ossessivo su design e scalabilità.
           </motion.p>
 
           <motion.div
@@ -673,78 +671,6 @@ const Home = () => {
             </a>
           </motion.div>
         </motion.div>
-      </section>
-
-      {/* Purpose Section for Google Verification */}
-      <section
-        id="purpose"
-        style={{
-          padding: "6rem 1.5rem",
-          background: "rgba(255,255,255,0.02)",
-          borderBottom: "1px solid var(--border-subtle)",
-        }}
-      >
-        <div
-          className="container"
-          style={{ maxWidth: "900px", margin: "0 auto", textAlign: "left" }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2
-              className="title"
-              style={{ fontSize: "2rem", marginBottom: "1.5rem" }}
-            >
-              Lo Scopo di{" "}
-              <span className="text-gradient">Matty Studios TECH</span>
-            </h2>
-            <div
-              style={{
-                color: "var(--text-muted)",
-                lineHeight: 1.8,
-                fontSize: "1.05rem",
-              }}
-            >
-              <p style={{ marginBottom: "1.5rem" }}>
-                <strong>Matty Studios TECH</strong> è una vetrina professionale
-                e una piattaforma di servizi digitali. Questo sito permette ai
-                nostri clienti di:
-              </p>
-              <ul
-                style={{
-                  paddingLeft: "1.5rem",
-                  marginBottom: "1.5rem",
-                  listStyleType: "square",
-                }}
-              >
-                <li>
-                  Gestire il proprio profilo utente e le impostazioni di
-                  sicurezza.
-                </li>
-                <li>
-                  Acquistare servizi digitali, plugin e bot personalizzati
-                  tramite il nostro shop integrato.
-                </li>
-                <li>
-                  Aprire e gestire ticket di supporto per assistenza tecnica
-                  diretta.
-                </li>
-                <li>
-                  Ricevere aggiornamenti e fatture relative ai propri ordini.
-                </li>
-              </ul>
-              <p>
-                Utilizziamo l'autenticazione tramite <strong>Google</strong> per
-                offrire un accesso sicuro e semplificato alla nostra area
-                riservata, garantendo che ogni utente possa gestire i propri
-                servizi acquistati in totale sicurezza senza dover creare nuove
-                password.
-              </p>
-            </div>
-          </motion.div>
-        </div>
       </section>
 
       {/* About Section */}
@@ -1322,7 +1248,7 @@ const Home = () => {
                   textTransform: "uppercase",
                 }}
               >
-                Matty Studios TECH
+                matty47ghigo.studios
               </div>
               <div style={{ fontSize: "0.65rem", color: "var(--text-dim)" }}>
                 <Link
@@ -1362,7 +1288,7 @@ const Home = () => {
                 letterSpacing: "0.3em",
               }}
             >
-              &copy; 2026 Matty Studios TECH. Crafted with Precision.
+              &copy; 2026 Matty47ghigo Studios. Crafted with Precision.
             </div>
             <div style={{ display: "flex", gap: "1.5rem" }}>
               <Github size={18} style={{ opacity: 0.5 }} />
