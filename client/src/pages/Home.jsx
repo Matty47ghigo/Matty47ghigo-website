@@ -318,7 +318,7 @@ const Home = () => {
                 fontSize: "0.8rem",
               }}
             >
-              Accesso Platform
+              Area Riservata
             </button>
 
             {showAccessMenu && (
@@ -349,7 +349,7 @@ const Home = () => {
                     letterSpacing: "0.2em",
                   }}
                 >
-                  Security Gate
+                  Sistema di Accesso
                 </div>
                 <div
                   style={{
@@ -521,7 +521,7 @@ const Home = () => {
                   letterSpacing: "0.1em",
                 }}
               >
-                Accesso Platform
+                Dashboard Utente
               </button>
 
               <GoogleLogin
@@ -673,6 +673,78 @@ const Home = () => {
             </a>
           </motion.div>
         </motion.div>
+      </section>
+
+      {/* Purpose Section for Google Verification */}
+      <section
+        id="purpose"
+        style={{
+          padding: "6rem 1.5rem",
+          background: "rgba(255,255,255,0.02)",
+          borderBottom: "1px solid var(--border-subtle)",
+        }}
+      >
+        <div
+          className="container"
+          style={{ maxWidth: "900px", margin: "0 auto", textAlign: "left" }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2
+              className="title"
+              style={{ fontSize: "2rem", marginBottom: "1.5rem" }}
+            >
+              Lo Scopo di{" "}
+              <span className="text-gradient">Matty47ghigo Studios</span>
+            </h2>
+            <div
+              style={{
+                color: "var(--text-muted)",
+                lineHeight: 1.8,
+                fontSize: "1.05rem",
+              }}
+            >
+              <p style={{ marginBottom: "1.5rem" }}>
+                <strong>Matty47ghigo Studios</strong> è una vetrina
+                professionale e una piattaforma di servizi digitali. Questo sito
+                permette ai nostri clienti di:
+              </p>
+              <ul
+                style={{
+                  paddingLeft: "1.5rem",
+                  marginBottom: "1.5rem",
+                  listStyleType: "square",
+                }}
+              >
+                <li>
+                  Gestire il proprio profilo utente e le impostazioni di
+                  sicurezza.
+                </li>
+                <li>
+                  Acquistare servizi digitali, plugin e bot personalizzati
+                  tramite il nostro shop integrato.
+                </li>
+                <li>
+                  Aprire e gestire ticket di supporto per assistenza tecnica
+                  diretta.
+                </li>
+                <li>
+                  Ricevere aggiornamenti e fatture relative ai propri ordini.
+                </li>
+              </ul>
+              <p>
+                Utilizziamo l'autenticazione tramite <strong>Google</strong> per
+                offrire un accesso sicuro e semplificato alla nostra area
+                riservata, garantendo che ogni utente possa gestire i propri
+                servizi acquistati in totale sicurezza senza dover creare nuove
+                password.
+              </p>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* About Section */}
