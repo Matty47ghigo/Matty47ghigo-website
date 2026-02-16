@@ -243,7 +243,7 @@ const Home = () => {
               fontWeight: 900,
               fontSize: "1.4rem",
               letterSpacing: "-1.5px",
-              textTransform: "lowercase",
+              textTransform: "none",
             }}
           >
             Matty47ghigo
@@ -1322,7 +1322,7 @@ const Home = () => {
                   textTransform: "uppercase",
                 }}
               >
-                matty47ghigo.studios
+                Matty47ghigo Studios
               </div>
               <div style={{ fontSize: "0.65rem", color: "var(--text-dim)" }}>
                 <Link
