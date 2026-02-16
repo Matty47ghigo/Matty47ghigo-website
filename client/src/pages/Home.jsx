@@ -675,6 +675,130 @@ const Home = () => {
         </motion.div>
       </section>
 
+      {/* Purpose Section - High-Tech Professional Service Platform */}
+      <section
+        id="purpose"
+        className="section container"
+        style={{ padding: "6rem 1.5rem", position: "relative" }}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="card"
+          style={{
+            padding: "4rem 3rem",
+            background: "rgba(255,255,255,0.01)",
+            border: "1px solid var(--border-subtle)",
+            borderRadius: "2rem",
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 100%)",
+          }}
+        >
+          <div
+            className="grid grid-cols-1 md-grid-cols-2 gap-12"
+            style={{ alignItems: "center" }}
+          >
+            <div>
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.75rem",
+                  padding: "0.5rem 1rem",
+                  borderRadius: "100px",
+                  background: "rgba(0,229,255,0.05)",
+                  border: "1px solid rgba(0,229,255,0.1)",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  color: "var(--accent)",
+                  letterSpacing: "0.1em",
+                  marginBottom: "2rem",
+                }}
+              >
+                PLATFORM INFRASTRUCTURE
+              </div>
+              <h2
+                className="title"
+                style={{ fontSize: "2.5rem", marginBottom: "1.5rem" }}
+              >
+                Lo Scopo di <br />
+                <span className="text-gradient">Matty47ghigo Studios</span>
+              </h2>
+              <p
+                style={{
+                  color: "var(--text-muted)",
+                  fontSize: "1.1rem",
+                  lineHeight: 1.8,
+                  marginBottom: "2rem",
+                }}
+              >
+                <strong>Matty47ghigo Studios</strong> è un ecosistema digitale
+                professionale progettato per offrire soluzioni software ad alto
+                impatto. La nostra piattaforma utilizza l'autenticazione sicura
+                per garantire un'esperienza personalizzata e protetta.
+              </p>
+            </div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "1.5rem",
+              }}
+            >
+              {[
+                {
+                  title: "Gestione Ordini",
+                  desc: "Monitoraggio in tempo reale dei servizi acquistati.",
+                },
+                {
+                  title: "Supporto Tecnico",
+                  desc: "Sistema di ticket prioritario per assistenza diretta.",
+                },
+                {
+                  title: "Area Download",
+                  desc: "Accesso sicuro a file, plugin e bot personalizzati.",
+                },
+                {
+                  title: "Account Sicuro",
+                  desc: "Protezione dei dati tramite standard OAuth moderni.",
+                },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  style={{
+                    padding: "1.5rem",
+                    background: "rgba(255,255,255,0.02)",
+                    borderRadius: "1.25rem",
+                    border: "1px solid var(--border-subtle)",
+                  }}
+                >
+                  <h4
+                    style={{
+                      fontSize: "0.9rem",
+                      fontWeight: 800,
+                      marginBottom: "0.5rem",
+                      color: "white",
+                    }}
+                  >
+                    {item.title}
+                  </h4>
+                  <p
+                    style={{
+                      fontSize: "0.75rem",
+                      color: "var(--text-dim)",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {item.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
       {/* About Section */}
       <section
         id="about"
