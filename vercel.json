@@ -3,13 +3,10 @@
   "buildCommand": "cd client && npm install && npm run build",
   "installCommand": "npm install",
   "outputDirectory": "client/dist",
-  "routes": [
+  "rewrites": [
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/client/dist/index.html"
+      "source": "/api/:path*",
+      "destination": "/api/index.js"
     }
   ],
   "functions": {

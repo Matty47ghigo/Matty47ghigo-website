@@ -1,11 +1,9 @@
 // Vercel serverless function entry point
-// This file imports the Express app from the server folder
+// This handles all /api/* routes
 
-// Set up environment
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 
-// Import the Express app
 const app = require('../server/index');
 
-// Export for Vercel serverless
+// Export for Vercel serverless - this will handle all routes
 module.exports = app;
