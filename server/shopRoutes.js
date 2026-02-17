@@ -131,8 +131,8 @@ router.post('/checkout/create-session', async (req, res) => {
             }),
             line_items: lineItems,
             mode: 'payment',
-            success_url: `${process.env.APP_URL || 'https://matty47ghigo-website.vercel.app'}/checkout/success?session_id={CHECKOUT_SESSION_ID}&order_id=${order._id}`,
-            cancel_url: `${process.env.APP_URL || 'https://matty47ghigo-website.vercel.app'}/checkout/cancel?order_id=${order._id}`,
+            success_url: `${process.env.APP_URL || 'https://matty47ghigo-studios.vercel.app'}/checkout/success?session_id={CHECKOUT_SESSION_ID}&order_id=${order._id}`,
+            cancel_url: `${process.env.APP_URL || 'https://matty47ghigo-studios.vercel.app'}/checkout/cancel?order_id=${order._id}`,
             ...(stripeCustomerId ? { customer: stripeCustomerId } : { customer_email: billingInfo.email }),
             metadata: {
                 orderId: order._id.toString(),
@@ -240,8 +240,8 @@ router.post('/checkout/create-subscription', async (req, res) => {
                 quantity: 1,
             }],
             mode: 'subscription',
-            success_url: `${process.env.APP_URL || 'https://matty47ghigo-website.vercel.app'}/checkout/success?session_id={CHECKOUT_SESSION_ID}&order_id=${order._id}`,
-            cancel_url: `${process.env.APP_URL || 'https://matty47ghigo-website.vercel.app'}/checkout/cancel?order_id=${order._id}`,
+            success_url: `${process.env.APP_URL || 'https://matty47ghigo-studios.vercel.app'}/checkout/success?session_id={CHECKOUT_SESSION_ID}&order_id=${order._id}`,
+            cancel_url: `${process.env.APP_URL || 'https://matty47ghigo-studios.vercel.app'}/checkout/cancel?order_id=${order._id}`,
             ...(stripeCustomerId ? { customer: stripeCustomerId } : { customer_email: billingInfo.email }),
             metadata: {
                 orderId: order._id.toString(),

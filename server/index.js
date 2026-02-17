@@ -45,7 +45,7 @@ app.get('*', (req, res, next) => {
 
 // Restrict CORS to only allow requests from the frontend
 const corsOptions = {
-    origin: process.env.APP_URL || 'https://matty47ghigo-website.vercel.app',
+    origin: process.env.APP_URL || 'https://matty47ghigo-studios.vercel.app',
     credentials: true,  // Allow cookies to be sent
     optionsSuccessStatus: 200
 };
@@ -143,7 +143,7 @@ app.get('/api/auth/verify', async (req, res) => {
             <div style="font-family: sans-serif; text-align: center; padding: 50px;">
                 <h1 style="color: #00e5ff;">Account Attivato! 🚀</h1>
                 <p>Il tuo account è stato verificato con successo. Ora puoi chiudere questa pagina e accedere al sito.</p>
-                <a href="https://matty47ghigo-website.vercel.app/login" style="display: inline-block; padding: 10px 20px; background: #00e5ff; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold;">Accedi a Matty47ghigo</a>
+                <a href="https://matty47ghigo-studios.vercel.app/login" style="display: inline-block; padding: 10px 20px; background: #00e5ff; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold;">Accedi a Matty47ghigo</a>
             </div>
         `);
     } catch (error) {
