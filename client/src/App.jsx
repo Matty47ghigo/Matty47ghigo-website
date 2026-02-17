@@ -10,6 +10,7 @@ import CheckoutCancel from "./pages/CheckoutCancel";
 import Login from "./pages/Login";
 import DashboardLayout from "./pages/Dashboard/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CookieConsent from "./components/CookieConsent";
 import axios from "axios";
 import "./index.css";
 
@@ -44,6 +45,7 @@ function App() {
   return (
     <CartProvider>
       <Router>
+        <CookieConsent />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />

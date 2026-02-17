@@ -9,6 +9,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import axios from "axios";
+import api from "../utils/api";
 import { useNavigate, Link } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 
@@ -49,6 +50,7 @@ const Login = () => {
         return;
       }
 
+      
       localStorage.setItem("user", JSON.stringify(res.data.user));
       navigate("/dashboard");
     } catch (err) {
@@ -71,6 +73,7 @@ const Login = () => {
       });
       localStorage.removeItem("tempUserId");
       localStorage.removeItem("tempId");
+      
       localStorage.setItem("user", JSON.stringify(res.data.user));
       navigate("/dashboard");
     } catch (err) {
@@ -114,6 +117,7 @@ const Login = () => {
         return;
       }
 
+      
       localStorage.setItem("user", JSON.stringify(res.data.user));
       navigate("/dashboard");
     } catch (err) {
@@ -483,3 +487,4 @@ const Login = () => {
 };
 
 export default Login;
+

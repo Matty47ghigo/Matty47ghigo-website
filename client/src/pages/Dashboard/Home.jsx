@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingCart, LifeBuoy, CreditCard, ArrowRight, User } from 'lucide-react';
-import axios from 'axios';
+import api from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
@@ -11,12 +11,12 @@ const Home = () => {
     const [userStats, setUserStats] = useState({ orders: 0, tickets: 0, payments: 0 });
 
     useEffect(() => {
-        axios.get('/api/stats')
+        api.get('/api/stats')
             .then(res => setStats(res.data))
             .catch(err => console.error(err));
             
         if (user._id) {
-            axios.get(`/api/users/${user._id}/stats`)
+            api.get(`/api/users/${user._id}/stats`)
                 .then(res => setUserStats(res.data))
                 .catch(err => console.error(err));
         }
@@ -94,3 +94,4 @@ const Home = () => {
 };
 
 export default Home;
+

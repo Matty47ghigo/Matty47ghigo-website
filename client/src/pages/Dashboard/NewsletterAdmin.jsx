@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../utils/api";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Mail,
@@ -34,8 +34,8 @@ const NewsletterAdmin = () => {
     setLoading(true);
     try {
       const [subRes, postRes] = await Promise.all([
-        axios.get("/api/newsletter/subscribers"),
-        axios.get("/api/newsletter/posts"),
+        api.get("/api/newsletter/subscribers"),
+        api.get("/api/newsletter/posts"),
       ]);
       setSubscribers(subRes.data);
       setPosts(postRes.data);
@@ -49,7 +49,7 @@ const NewsletterAdmin = () => {
   const handleCreatePost = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("/api/newsletter/posts", newPost);
+      await api.post("/api/newsletter/posts", newPost);
       setNewPost({ title: "", content: "" });
       setShowCreatePost(false);
       fetchData();
@@ -69,7 +69,7 @@ const NewsletterAdmin = () => {
 
     setSendingId(id);
     try {
-      const res = await axios.post(`/api/newsletter/posts/${id}/send`);
+      const res = await api.post(`/api/newsletter/posts/${id}/send`);
       fetchData();
       showStatus("success", res.data.message);
     } catch (err) {
@@ -82,7 +82,7 @@ const NewsletterAdmin = () => {
   const handleDeletePost = async (id) => {
     if (!window.confirm("Eliminare questo post?")) return;
     try {
-      await axios.delete(`/api/newsletter/posts/${id}`);
+      await api.delete(`/api/newsletter/posts/${id}`);
       fetchData();
       showStatus("success", "Post eliminato");
     } catch (err) {
@@ -530,3 +530,4 @@ const NewsletterAdmin = () => {
 };
 
 export default NewsletterAdmin;
+

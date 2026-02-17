@@ -74,6 +74,7 @@ const Home = () => {
         return;
       }
 
+      
       localStorage.setItem("user", JSON.stringify(res.data.user));
       window.location.href = res.data.user.isAdmin
         ? "/dashboard"
@@ -1590,3 +1591,4 @@ const Home = () => {
 };
 
 export default Home;
+

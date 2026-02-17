@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CreditCard, Plus, Trash2, ShieldCheck, Lock, X } from 'lucide-react';
-import axios from 'axios';
+import api from '../../utils/api';
 import CreditCardForm from '../../components/CreditCard';
 
 const Payments = () => {
@@ -18,7 +18,7 @@ const Payments = () => {
 
     const fetchMethods = async () => {
         try {
-            const res = await axios.get(`/api/users/${user._id}/payments`);
+            const res = await api.get(`/api/users/${user._id}/payments`);
             setMethods(res.data || []);
         } catch (err) {
             console.error("Fetch Payments Error:", err);
@@ -29,7 +29,7 @@ const Payments = () => {
     const handleSaveCard = async (cardData) => {
         setLoading(true);
         try {
-            const res = await axios.post(`/api/users/${user._id}/payments`, {
+            const res = await api.post(`/api/users/${user._id}/payments`, {
                 type: 'Carta',
                 last4: cardData.cardNumber.replace(/\s/g, '').slice(-4),
                 brand: cardData.cardType
@@ -46,7 +46,7 @@ const Payments = () => {
     const removeMethod = async (paymentId) => {
         if (!confirm('Eliminare questo metodo di pagamento?')) return;
         try {
-            const res = await axios.delete(`/api/users/${user._id}/payments/${paymentId}`);
+            const res = await api.delete(`/api/users/${user._id}/payments/${paymentId}`);
             setMethods(res.data);
         } catch (err) {
             alert('Errore eliminazione');
@@ -142,3 +142,4 @@ const Payments = () => {
 };
 
 export default Payments;
+

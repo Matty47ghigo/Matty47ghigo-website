@@ -4,12 +4,14 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const axios = require('axios');
 const crypto = require('crypto');
+const cookieParser = require('cookie-parser');
 const { OAuth2Client } = require('google-auth-library');
 const { User, Ticket, Order, Stats, AdminConfig, Product, getAdminStatus, incrementVisitors } = require('./db');
 const { sendVerificationEmail, sendTicketClosedEmail, sendAdminNotification, send2FACodeEmail } = require('./email');
 const shopRoutes = require('./shopRoutes');
 const newsletterRoutes = require('./newsletterRoutes');
 const { authenticator } = require('otplib');
+const { generateToken, sanitizeUser, verifyToken, isAdmin, setTokenCookie } = require('./authMiddleware');
 
 // Configure authenticator for better compatibility
 // window: 1 allows for 1 step tolerance (previous and current time step)
@@ -31,7 +33,15 @@ console.log('Google Client ID caricato:', process.env.GOOGLE_CLIENT_ID);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+// Restrict CORS to only allow requests from the frontend
+const corsOptions = {
+    origin: process.env.APP_URL || 'https://matty47ghigo-website.vercel.app',
+    credentials: true,  // Allow cookies to be sent
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+app.use(cookieParser());  // Parse cookies from requests
 
 // Stripe webhook needs raw body - must be before bodyParser.json()
 app.use(['/api/shop/webhook/stripe', '/api/webhook/stripe'], express.raw({ type: 'application/json' }));
@@ -156,7 +166,9 @@ app.post('/api/auth/login', async (req, res) => {
             });
         }
 
-        res.json({ message: "Login effettuato", user: result.user });
+        const token = generateToken(result.user._id, result.user.email);
+        setTokenCookie(res, token);
+        res.json({ message: "Login effettuato", user: sanitizeUser(result.user) });
     } catch (error) {
         res.status(500).json({ message: "Errore interno" });
     }
@@ -187,10 +199,18 @@ app.post('/api/auth/2fa/login-verify', async (req, res) => {
         user.tempAuthCodeExpires = undefined;
         await user.save();
 
-        res.json({ message: "Login effettuato", user });
+        const token = generateToken(user._id, user.email);
+        setTokenCookie(res, token);
+        res.json({ message: "Login effettuato", user: sanitizeUser(user) });
     } catch (error) {
         res.status(500).json({ message: "Errore durante la verifica del login 2FA" });
     }
+});
+
+// Logout endpoint
+app.post('/api/auth/logout', (req, res) => {
+    res.clearCookie('token');
+    res.json({ message: 'Logout effettuato con successo' });
 });
 
 // Helper function to handle 2FA check after login
@@ -207,7 +227,7 @@ const handleTwoFactorCheck = async (user) => {
         };
     }
 
-    return { requires2FA: false, user };
+    return { requires2FA: false, user: sanitizeUser(user) };
 };
 
 // Social Auth Upsert Helper
@@ -366,6 +386,8 @@ app.post('/api/auth/google', async (req, res) => {
             });
         }
 
+        const token = generateToken(result.user._id, result.user.email);
+        setTokenCookie(res, token);
         res.json({ message: "Google login successful", user: result.user });
     } catch (error) {
         console.error("Google Auth Error:", error);
@@ -410,6 +432,8 @@ app.post('/api/auth/github', async (req, res) => {
             });
         }
 
+        const token = generateToken(result.user._id, result.user.email);
+        setTokenCookie(res, token);
         res.json({ message: "GitHub login successful", user: result.user });
     } catch (error) {
         console.error("GitHub Auth Error:", error.response?.data || error.message);
@@ -460,6 +484,8 @@ app.post('/api/auth/discord', async (req, res) => {
             });
         }
 
+        const token = generateToken(result.user._id, result.user.email);
+        setTokenCookie(res, token);
         res.json({ message: "Discord login successful", user: result.user });
     } catch (error) {
         console.error("Discord Auth Error:", error.response?.data || error.message);
@@ -555,7 +581,7 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
-app.patch('/api/users/:id/role', async (req, res) => {
+app.patch('/api/users/:id/role', verifyToken, isAdmin, async (req, res) => {
     const { isAdmin } = req.body;
     try {
         const user = await User.findByIdAndUpdate(req.params.id, { isAdmin }, { new: true });
@@ -565,7 +591,7 @@ app.patch('/api/users/:id/role', async (req, res) => {
     }
 });
 
-app.patch('/api/users/:id/ban', async (req, res) => {
+app.patch('/api/users/:id/ban', verifyToken, isAdmin, async (req, res) => {
     const { isBanned } = req.body;
     try {
         const user = await User.findByIdAndUpdate(req.params.id, { isBanned }, { new: true });
@@ -576,7 +602,7 @@ app.patch('/api/users/:id/ban', async (req, res) => {
 });
 
 // --- User Profile Update ---
-app.patch('/api/users/:id', async (req, res) => {
+app.patch('/api/users/:id', verifyToken, async (req, res) => {
     const { address, cap, picture, name, surname, email } = req.body;
     try {
         const updateData = {};
@@ -722,10 +748,10 @@ app.delete('/api/users/:id/payments/:paymentId', async (req, res) => {
 
 // --- Admin Utility ---
 
-app.post('/api/admin/reset', async (req, res) => {
+app.post('/api/admin/reset', verifyToken, isAdmin, async (req, res) => {
     const { password } = req.body;
     // Simple safety check: match admin setup or env password (in a real app this would use JWT auth)
-    if (password !== 'Matty47ghigo231747#!') {
+    if (password !== process.env.ADMIN_RESET_PASSWORD) {
         return res.status(401).json({ message: "Autorizzazione negata" });
     }
 
@@ -753,7 +779,7 @@ app.post('/api/admin/reset', async (req, res) => {
 // --- Enhanced Danger Zone & Security ---
 
 // User Account Deletion
-app.delete('/api/users/:id', async (req, res) => {
+app.delete('/api/users/:id', verifyToken, async (req, res) => {
     const { password } = req.body;
     try {
         const user = await User.findById(req.params.id);
@@ -777,9 +803,9 @@ app.delete('/api/users/:id', async (req, res) => {
 });
 
 // Admin Hard Reset (Wipe everything except SuperAdmin)
-app.post('/api/admin/hard-reset', async (req, res) => {
+app.post('/api/admin/hard-reset', verifyToken, isAdmin, async (req, res) => {
     const { password } = req.body;
-    if (password !== 'Matty47ghigo231747#') {
+    if (password !== process.env.ADMIN_RESET_PASSWORD) {
         return res.status(401).json({ message: "Autorizzazione negata. Password di hard reset errata." });
     }
 

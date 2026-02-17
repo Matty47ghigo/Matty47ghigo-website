@@ -12,7 +12,7 @@ import {
   Download,
   AlertCircle,
 } from "lucide-react";
-import axios from "axios";
+import api from "../../utils/api";
 
 const Orders = () => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -26,7 +26,7 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const res = await axios.get("/api/shop/orders", {
+        const res = await api.get("/api/shop/orders", {
           headers: { "x-user-id": user._id || user.id },
         });
         setOrders(res.data);
@@ -920,3 +920,4 @@ const Orders = () => {
 };
 
 export default Orders;
+

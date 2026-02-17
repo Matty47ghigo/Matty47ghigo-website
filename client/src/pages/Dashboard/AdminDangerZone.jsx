@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, UserX, Database, ShieldAlert, Trash2 } from 'lucide-react';
-import axios from 'axios';
+import api from '../../utils/api';
 
 const AdminDangerZone = () => {
     const [stats, setStats] = useState({ users: 0, tickets: 0, orders: 0 });
@@ -18,7 +18,7 @@ const AdminDangerZone = () => {
         if (!password) return;
         if (password !== 'Matty47ghigo231747#') return alert('Password master errata!');
         try {
-            const res = await axios.post('/api/admin/hard-reset', { password });
+            const res = await api.post('/api/admin/hard-reset', { password });
             alert(res.data.message);
             window.location.reload();
         } catch (err) {
@@ -36,7 +36,7 @@ const AdminDangerZone = () => {
         if (!password) return;
         if (password !== 'Matty47ghigo231747#!') return alert('Password errata!');
         try {
-            const res = await axios.post('/api/admin/reset', { password });
+            const res = await api.post('/api/admin/reset', { password });
             alert(res.data.message);
         } catch (err) {
             alert('Errore: ' + (err.response?.data?.message || err.message));
@@ -54,7 +54,7 @@ const AdminDangerZone = () => {
         if (password !== 'Matty47ghigo231747#') return alert('Password errata!');
         
         try {
-            const res = await axios.post('/api/admin/reset-products', { password });
+            const res = await api.post('/api/admin/reset-products', { password });
             alert(res.data.message);
         } catch (err) {
             alert('Errore: ' + (err.response?.data?.message || err.message));
@@ -158,3 +158,4 @@ const AdminDangerZone = () => {
 };
 
 export default AdminDangerZone;
+

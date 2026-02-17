@@ -17,7 +17,7 @@ import {
   RefreshCw,
   CreditCard,
 } from "lucide-react";
-import axios from "axios";
+import api from "../../utils/api";
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -40,7 +40,7 @@ const AdminOrders = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/api/shop/admin/orders");
+      const res = await api.get("/api/shop/admin/orders");
       setOrders(res.data);
 
       // Calculate stats
@@ -63,7 +63,7 @@ const AdminOrders = () => {
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
-      await axios.patch(`/api/shop/orders/${orderId}/status`, {
+      await api.patch(`/api/shop/orders/${orderId}/status`, {
         status: newStatus,
       });
       fetchOrders(); // Refresh data
@@ -1006,3 +1006,4 @@ const AdminOrders = () => {
 };
 
 export default AdminOrders;
+

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Mail, Lock, MapPin, Globe, Github, Chrome, MessageSquare, Save, ShieldCheck, AlertCircle, Trash2, Shield, X, Copy, CreditCard } from 'lucide-react';
-import axios from 'axios';
+import api from '../../utils/api';
 import CreditCardForm from '../../components/CreditCard';
 
 const Profile = () => {
@@ -27,7 +27,7 @@ const Profile = () => {
 
     const handleSave = async () => {
         try {
-            const res = await axios.patch(`/api/users/${user._id}`, {
+            const res = await api.patch(`/api/users/${user._id}`, {
                 address,
                 cap,
                 picture: profilePicture
@@ -44,7 +44,7 @@ const Profile = () => {
     // Handle saving credit card
     const handleSaveCard = async (cardData) => {
         try {
-            const res = await axios.patch(`/api/users/${user._id}`, {
+            const res = await api.patch(`/api/users/${user._id}`, {
                 savedCard: cardData
             });
             setSavedCard(cardData);
@@ -73,7 +73,7 @@ const Profile = () => {
         setLoading(true);
         try {
             console.log('Starting 2FA setup for user:', user._id);
-            const response = await axios.post('/api/auth/2fa/setup', { 
+            const response = await api.post('/api/auth/2fa/setup', { 
                 userId: user._id 
             });
             
@@ -126,7 +126,7 @@ const Profile = () => {
         try {
             console.log('Verifying 2FA code:', code);
             
-            const response = await axios.post('/api/auth/2fa/verify', { 
+            const response = await api.post('/api/auth/2fa/verify', { 
                 userId: user._id, 
                 token: code
             });
@@ -173,7 +173,7 @@ const Profile = () => {
         const password = prompt('Inserisci la password per disabilitare 2FA:');
         if (!password) return;
         try {
-            await axios.post('/api/auth/2fa/disable', { userId: user._id, password });
+            await api.post('/api/auth/2fa/disable', { userId: user._id, password });
             setIs2FAEnabled(false);
             const updatedUser = { ...user, isTwoFactorEnabled: false };
             localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -187,7 +187,7 @@ const Profile = () => {
     const handleSetPassword = async () => {
         if (!newSocialPassword) return;
         try {
-            const res = await axios.post('/api/auth/set-password', { 
+            const res = await api.post('/api/auth/set-password', { 
                 userId: user._id, 
                 password: newSocialPassword 
             });
@@ -221,7 +221,7 @@ const Profile = () => {
         if (!password) return;
 
         try {
-            const res = await axios.delete(`/api/users/${user._id}`, { data: { password } });
+            const res = await api.delete(`/api/users/${user._id}`, { data: { password } });
             alert(res.data.message);
             localStorage.removeItem('user');
             window.location.href = '/login';
@@ -467,3 +467,4 @@ const Profile = () => {
 };
 
 export default Profile;
+

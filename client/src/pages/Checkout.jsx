@@ -95,6 +95,7 @@ const Checkout = () => {
         return;
       }
 
+      
       localStorage.setItem("user", JSON.stringify(res.data.user));
       setStep("billing");
     } catch (err) {
@@ -128,6 +129,7 @@ const Checkout = () => {
         password: registerPassword,
       });
 
+      
       localStorage.setItem("user", JSON.stringify(res.data.user));
       setStep("billing");
       setBillingInfo((prev) => ({ ...prev, email: registerEmail }));
@@ -1826,3 +1828,4 @@ const Checkout = () => {
 };
 
 export default Checkout;
+

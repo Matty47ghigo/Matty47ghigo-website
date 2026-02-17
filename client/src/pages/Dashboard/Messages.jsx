@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../utils/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Mail, User as UserIcon, Trash2 } from 'lucide-react';
 
@@ -7,7 +7,7 @@ const Messages = () => {
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-        axios.get('/api/messages')
+        api.get('/api/messages')
             .then(res => setMessages(res.data))
             .catch(err => console.error(err));
     }, []);
@@ -75,3 +75,4 @@ const Messages = () => {
 };
 
 export default Messages;
+

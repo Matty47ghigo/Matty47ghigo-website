@@ -5,7 +5,7 @@ import {
     PieChart, Pie, Cell, AreaChart, Area
 } from 'recharts';
 import { Star, TrendingUp } from 'lucide-react';
-import axios from 'axios';
+import api from '../../utils/api';
 
 const AdminStats = () => {
     const [data, setData] = useState({
@@ -24,8 +24,8 @@ const AdminStats = () => {
         const fetchStats = async () => {
             try {
                 const [statsRes, feedbackRes] = await Promise.all([
-                    axios.get('/api/stats'),
-                    axios.get('/api/feedback/recent')
+                    api.get('/api/stats'),
+                    api.get('/api/feedback/recent')
                 ]);
                 
                 setData({
@@ -226,7 +226,7 @@ const AdminStats = () => {
                             const pass = prompt('Inserisci la password di conferma (admin-reset-confirm):');
                             if (!pass) return;
                             try {
-                                const res = await axios.post('/api/admin/reset', { password: pass });
+                                const res = await api.post('/api/admin/reset', { password: pass });
                                 alert(res.data.message);
                                 window.location.reload();
                             } catch (err) {
@@ -245,3 +245,4 @@ const AdminStats = () => {
 };
 
 export default AdminStats;
+

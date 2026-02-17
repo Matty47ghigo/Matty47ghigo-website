@@ -939,32 +939,10 @@ router.post('/coupons/validate', async (req, res) => {
                 }
             }
         } catch (stripeError) {
-            console.log('Stripe coupon lookup failed, using fallback');
+            console.log('Stripe coupon lookup failed:', stripeError.message);
         }
 
-        // Fallback: Simple coupon validation for demo
-        if (code.startsWith('SAVE')) {
-            const percent = parseInt(code.replace('SAVE', ''));
-            if (percent > 0 && percent <= 100) {
-                return res.json({
-                    valid: true,
-                    coupon: { type: 'percentage', value: percent },
-                    message: `Sconto del ${percent}% applicato!`
-                });
-            }
-        }
-
-        if (code.startsWith('EURO')) {
-            const amount = parseInt(code.replace('EURO', ''));
-            if (amount > 0 && amount <= 500) {
-                return res.json({
-                    valid: true,
-                    coupon: { type: 'fixed', value: amount },
-                    message: `Sconto di ${amount}€ applicato!`
-                });
-            }
-        }
-
+        // No fallback - only valid Stripe coupons are accepted
         res.json({ valid: false, message: 'Codice sconto non valido o scaduto' });
     } catch (error) {
         console.error('Validate coupon error:', error);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../utils/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Shield, Mail, Globe, Calendar, CheckCircle, Clock } from 'lucide-react';
 
@@ -11,14 +11,14 @@ const Users = () => {
     }, []);
 
     const fetchUsers = () => {
-        axios.get('/api/users')
+        api.get('/api/users')
             .then(res => setUsers(res.data))
             .catch(err => console.error(err));
     };
 
     const toggleRole = async (userId, isAdmin) => {
         try {
-            await axios.patch(`/api/users/${userId}/role`, { isAdmin: !isAdmin });
+            await api.patch(`/api/users/${userId}/role`, { isAdmin: !isAdmin });
             fetchUsers();
         } catch (err) {
             alert('Errore aggiornamento ruolo');
@@ -28,7 +28,7 @@ const Users = () => {
     const toggleBan = async (userId, isBanned) => {
         if (!isBanned && !confirm('Sei sicuro di voler bannare questo utente? L\'account non potrà più autenticarsi.')) return;
         try {
-            await axios.patch(`/api/users/${userId}/ban`, { isBanned: !isBanned });
+            await api.patch(`/api/users/${userId}/ban`, { isBanned: !isBanned });
             fetchUsers();
         } catch (err) {
             alert('Errore ban utente');
@@ -141,3 +141,4 @@ const Users = () => {
 };
 
 export default Users;
+

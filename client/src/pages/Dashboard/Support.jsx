@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LifeBuoy, Send, MessageSquare, CheckCircle, RefreshCw, Star } from 'lucide-react';
-import axios from 'axios';
+import api from '../../utils/api';
 
 const FeedbackSection = ({ onSubmit }) => {
     const [rating, setRating] = useState(0);
@@ -75,7 +75,7 @@ const Support = () => {
         if (!activeTicket) return;
         const interval = setInterval(async () => {
             try {
-                const res = await axios.get('/api/tickets');
+                const res = await api.get('/api/tickets');
                 const fresh = res.data.find(t => t._id === activeTicket._id);
                 if (fresh && JSON.stringify(fresh.messages) !== JSON.stringify(activeTicket.messages)) {
                     setActiveTicket(fresh);
@@ -95,7 +95,7 @@ const Support = () => {
 
     const fetchTickets = async () => {
         try {
-            const res = await axios.get('/api/tickets');
+            const res = await api.get('/api/tickets');
             const data = isAdmin ? res.data : res.data.filter(t => t.userId?._id === user._id);
             setTickets(data);
         } catch (err) {
@@ -106,7 +106,7 @@ const Support = () => {
     const handleCreateTicket = async () => {
         if (!newTicketSubject) return;
         try {
-            const res = await axios.post('/api/tickets', {
+            const res = await api.post('/api/tickets', {
                 userId: user._id, 
                 problem: newTicketSubject // backend will summarize this
             });
@@ -129,7 +129,7 @@ const Support = () => {
         };
         
         try {
-            const res = await axios.post(`/api/tickets/${activeTicket._id}/message`, msgData);
+            const res = await api.post(`/api/tickets/${activeTicket._id}/message`, msgData);
             setActiveTicket(res.data);
             setNewMessage('');
             // Update the ticket in the list as well
@@ -142,7 +142,7 @@ const Support = () => {
     const closeTicket = async () => {
         if (!activeTicket || !isAdmin) return;
         try {
-            const res = await axios.patch(`/api/tickets/${activeTicket._id}`, {
+            const res = await api.patch(`/api/tickets/${activeTicket._id}`, {
                 status: 'closed'
             });
             setActiveTicket(res.data);
@@ -349,7 +349,7 @@ const Support = () => {
                                             <p style={{ fontSize: '0.8rem', fontWeight: 700, opacity: 0.6 }}>Valuta il supporto ricevuto:</p>
                                             <FeedbackSection 
                                                 onSubmit={async (rating, comment) => {
-                                                    const res = await axios.patch(`/api/tickets/${activeTicket._id}`, { 
+                                                    const res = await api.patch(`/api/tickets/${activeTicket._id}`, { 
                                                         rating, 
                                                         feedbackComment: comment 
                                                     });
@@ -387,3 +387,4 @@ const Support = () => {
 };
 
 export default Support;
+
