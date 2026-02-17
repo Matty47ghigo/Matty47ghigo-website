@@ -74,7 +74,6 @@ const Home = () => {
         return;
       }
 
-      
       localStorage.setItem("user", JSON.stringify(res.data.user));
       window.location.href = res.data.user.isAdmin
         ? "/dashboard"
@@ -689,7 +688,6 @@ const Home = () => {
           className="card"
           style={{
             padding: "4rem 3rem",
-            background: "rgba(255,255,255,0.01)",
             border: "1px solid var(--border-subtle)",
             borderRadius: "2rem",
             background:
@@ -1591,4 +1589,3 @@ const Home = () => {
 };
 
 export default Home;
-
