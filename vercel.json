@@ -14,8 +14,12 @@
       "dest": "/api/index.js"
     },
     {
+      "src": "/favicon.ico",
+      "dest": "/client/dist/favicon.png"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/client/dist/$1"
+      "dest": "/client/dist/index.html"
     }
   ]
 }
