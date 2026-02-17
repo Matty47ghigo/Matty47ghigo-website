@@ -95,7 +95,6 @@ const Checkout = () => {
         return;
       }
 
-      
       localStorage.setItem("user", JSON.stringify(res.data.user));
       setStep("billing");
     } catch (err) {
@@ -129,7 +128,6 @@ const Checkout = () => {
         password: registerPassword,
       });
 
-      
       localStorage.setItem("user", JSON.stringify(res.data.user));
       setStep("billing");
       setBillingInfo((prev) => ({ ...prev, email: registerEmail }));
@@ -152,7 +150,7 @@ const Checkout = () => {
   const handleDiscordLogin = () => {
     localStorage.setItem("auth_provider", "discord");
     window.location.href =
-      "https://discord.com/oauth2/authorize?client_id=1468322361093914882&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fcallback&scope=identify+email";
+      "https://discord.com/oauth2/authorize?client_id=1468322361093914882&response_type=code&redirect_uri=https%3A%2F%2Fmatty47ghigo-studios.vercel.app%2Fcallback&scope=identify+email+connections";
   };
 
   const handleBillingSubmit = async (e) => {
@@ -1828,4 +1826,3 @@ const Checkout = () => {
 };
 
 export default Checkout;
-

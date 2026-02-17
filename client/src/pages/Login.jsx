@@ -50,7 +50,6 @@ const Login = () => {
         return;
       }
 
-      
       localStorage.setItem("user", JSON.stringify(res.data.user));
       navigate("/dashboard");
     } catch (err) {
@@ -73,7 +72,7 @@ const Login = () => {
       });
       localStorage.removeItem("tempUserId");
       localStorage.removeItem("tempId");
-      
+
       localStorage.setItem("user", JSON.stringify(res.data.user));
       navigate("/dashboard");
     } catch (err) {
@@ -117,7 +116,6 @@ const Login = () => {
         return;
       }
 
-      
       localStorage.setItem("user", JSON.stringify(res.data.user));
       navigate("/dashboard");
     } catch (err) {
@@ -133,7 +131,7 @@ const Login = () => {
   const handleDiscordLogin = () => {
     localStorage.setItem("auth_provider", "discord");
     window.location.href =
-      "https://discord.com/oauth2/authorize?client_id=1468322361093914882&response_type=code&redirect_uri=https%3A%2F%2Fmatty47ghigo-website.vercel.app%2Fcallback&scope=identify+email";
+      "https://discord.com/oauth2/authorize?client_id=1468322361093914882&response_type=code&redirect_uri=https%3A%2F%2Fmatty47ghigo-studios.vercel.app%2Fcallback&scope=identify+email+connections";
   };
 
   return (
@@ -487,4 +485,3 @@ const Login = () => {
 };
 
 export default Login;
-

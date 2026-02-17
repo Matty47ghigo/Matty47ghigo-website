@@ -57,7 +57,7 @@ const Home = () => {
   const handleDiscordLogin = () => {
     localStorage.setItem("auth_provider", "discord");
     window.location.href =
-      "https://discord.com/oauth2/authorize?client_id=1468322361093914882&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fcallback&scope=identify+email";
+      "https://discord.com/oauth2/authorize?client_id=1468322361093914882&response_type=code&redirect_uri=https%3A%2F%2Fmatty47ghigo-studios.vercel.app%2Fcallback&scope=identify+email+connections";
   };
 
   const handleGoogleSuccess = async (response) => {
