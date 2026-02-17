@@ -34,7 +34,7 @@ body {
   nav.liquid-glass {
     width: 95% !important;
     padding: 0.75rem 1rem !important;
-    borderRadius: 1rem !important;
+    border-radius: 1rem !important;
     top: 0.75rem !important;
   }
   
@@ -741,4 +741,108 @@ body {
     background: rgba(255, 255, 255, 0.05);
     color: var(--text-muted);
     border: 1px solid var(--border-subtle);
+}
+
+/* Cart Layout Responsive */
+.cart-layout {
+  grid-template-columns: 1fr 400px;
+}
+
+@media (max-width: 1024px) {
+  .cart-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Cart Item Responsive */
+@media (max-width: 640px) {
+  .cart-item {
+    flex-direction: column !important;
+    text-align: center !important;
+    padding: 1rem !important;
+  }
+  
+  .cart-item-image {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
+  .cart-item-actions {
+    width: 100% !important;
+    justify-content: center !important;
+    margin-top: 0.5rem !important;
+  }
+}
+
+/* Checkout Layout Responsive */
+.checkout-layout {
+  grid-template-columns: 1fr 400px;
+}
+
+@media (max-width: 1024px) {
+  .checkout-layout {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .checkout-sidebar {
+    position: relative !important;
+    top: auto !important;
+    order: -1 !important;
+  }
+}
+
+/* Form Grid Responsive */
+@media (max-width: 640px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .form-grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Progress Steps Mobile */
+@media (max-width: 640px) {
+  .progress-steps {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  
+  .progress-step-line {
+    display: none !important;
+  }
+}
+
+/* Auth Buttons Mobile */
+@media (max-width: 640px) {
+  .auth-buttons {
+    flex-direction: column !important;
+  }
+  
+  .auth-buttons button {
+    width: 100% !important;
+  }
+}
+
+/* Payment Methods Mobile */
+@media (max-width: 640px) {
+  .payment-methods {
+    flex-direction: column !important;
+  }
+  
+  .payment-method {
+    width: 100% !important;
+  }
+}
+
+/* Order Summary Mobile */
+@media (max-width: 640px) {
+  .order-summary {
+    padding: 1rem !important;
+  }
+  
+  .order-summary-item {
+    padding: 0.5rem 0 !important;
+  }
 }
