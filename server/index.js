@@ -35,13 +35,8 @@ const PORT = process.env.PORT || 3001;
 
 // Serve static files from client dist folder
 const path = require('path');
-app.use(express.static(path.join(__dirname, '../client/dist')));
-
-// Serve index.html for all non-API routes (SPA support)
-app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) return next();
-    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
-});
+const clientDistPath = path.join(__dirname, '../client/dist');
+app.use(express.static(clientDistPath));
 
 // Restrict CORS to only allow requests from the frontend
 const corsOptions = {
@@ -1335,6 +1330,11 @@ app.post('/api/products/seed', async (req, res) => {
         console.error('Seed error:', error);
         res.status(500).json({ message: "Errore durante il seed dei prodotti" });
     }
+});
+
+// Serve index.html for all non-API routes (SPA support) - MUST be after all API routes
+app.get('*', (req, res) => {
+    res.sendFile(path.join(clientDistPath, 'index.html'));
 });
 
 if (require.main === module) {

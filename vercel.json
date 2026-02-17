@@ -2,6 +2,7 @@
   "version": 2,
   "buildCommand": "cd client && npm install && npm run build",
   "installCommand": "npm install",
+  "outputDirectory": "client/dist",
   "routes": [
     {
       "src": "/api/(.*)",
@@ -12,7 +13,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/api/index.js"
+      "dest": "/client/dist/index.html"
     }
   ]
 }
