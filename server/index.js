@@ -33,6 +33,16 @@ console.log('Google Client ID caricato:', process.env.GOOGLE_CLIENT_ID);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Serve static files from client dist folder
+const path = require('path');
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
+// Serve index.html for all non-API routes (SPA support)
+app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
+
 // Restrict CORS to only allow requests from the frontend
 const corsOptions = {
     origin: process.env.APP_URL || 'https://matty47ghigo-website.vercel.app',
