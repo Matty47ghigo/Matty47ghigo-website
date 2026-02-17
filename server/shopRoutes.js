@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { Order, User } = require('./db');
 const Stripe = require('stripe');
+const { verifyToken, isAdmin } = require('./authMiddleware');
 
 // Initialize Stripe with secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_live_placeholder');
@@ -723,15 +724,8 @@ router.patch('/orders/:id/status', async (req, res) => {
 });
 
 // Get all orders (admin)
-router.get('/admin/orders', async (req, res) => {
+router.get('/admin/orders', verifyToken, isAdmin, async (req, res) => {
     try {
-        const userId = req.headers['x-user-id'];
-
-        const user = await User.findById(userId);
-        if (!user || !user.isAdmin) {
-            return res.status(403).json({ message: 'Solo admin può visualizzare tutti gli ordini' });
-        }
-
         const orders = await Order.find()
             .populate('userId', 'name email')
             .sort({ createdAt: -1 });
@@ -746,27 +740,14 @@ router.get('/admin/orders', async (req, res) => {
 // ============ COUPON ROUTES ============
 
 // Get all coupons (admin)
-router.get('/admin/coupons', async (req, res) => {
+router.get('/admin/coupons', verifyToken, isAdmin, async (req, res) => {
     try {
-        const userId = req.headers['x-user-id'];
-
-        if (!userId || userId.length !== 24) {
-            return res.status(401).json({ message: 'Identificativo utente non valido' });
-        }
-
-        const user = await User.findById(userId);
-        if (!user || !user.isAdmin) {
-            return res.status(403).json({ message: 'Solo admin può visualizzare i coupon' });
-        }
-
-        try {
-            const stripeCoupons = await stripe.coupons.list({ limit: 100 });
-            res.json({ coupons: stripeCoupons.data });
-        } catch (stripeError) {
-            console.error('Stripe error:', stripeError);
-            // Return empty list if Stripe is not configured
-            res.json({ coupons: [], error: 'Stripe non configurato' });
-        }
+        const stripeCoupons = await stripe.coupons.list({ limit: 100 });
+        res.json({ coupons: stripeCoupons.data });
+    } catch (stripeError) {
+        console.error('Stripe error:', stripeError);
+        // Return empty list if Stripe is not configured
+        res.json({ coupons: [], error: 'Stripe non configurato' });
     } catch (error) {
         console.error('Get coupons error:', error);
         res.status(500).json({ message: 'Errore recupero coupon' });
@@ -774,7 +755,7 @@ router.get('/admin/coupons', async (req, res) => {
 });
 
 // Create coupon (admin)
-router.post('/admin/coupons/create', async (req, res) => {
+router.post('/admin/coupons/create', verifyToken, isAdmin, async (req, res) => {
     try {
         const {
             code,
@@ -785,17 +766,6 @@ router.post('/admin/coupons/create', async (req, res) => {
             minAmount,
             currency
         } = req.body;
-
-        const userId = req.headers['x-user-id'];
-
-        if (!userId || userId.length !== 24) {
-            return res.status(401).json({ message: 'Identificativo utente non valido o mancante' });
-        }
-
-        const user = await User.findById(userId);
-        if (!user || !user.isAdmin) {
-            return res.status(403).json({ message: 'Solo admin può creare coupon' });
-        }
 
         // Build Stripe coupon data
         const couponData = {
@@ -858,19 +828,8 @@ router.post('/admin/coupons/create', async (req, res) => {
 });
 
 // Delete coupon (admin)
-router.delete('/admin/coupons/:id', async (req, res) => {
+router.delete('/admin/coupons/:id', verifyToken, isAdmin, async (req, res) => {
     try {
-        const userId = req.headers['x-user-id'];
-
-        if (!userId || userId.length !== 24) {
-            return res.status(401).json({ message: 'Identificativo utente non valido' });
-        }
-
-        const user = await User.findById(userId);
-        if (!user || !user.isAdmin) {
-            return res.status(403).json({ message: 'Solo admin può eliminare coupon' });
-        }
-
         const couponId = req.params.id;
 
         // Delete from Stripe

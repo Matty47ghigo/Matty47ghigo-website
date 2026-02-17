@@ -42,12 +42,10 @@ const CookieConsent = () => {
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         style={{
           position: "fixed",
-          bottom: "2rem",
-          left: "50%",
-          transform: "translateX(-50%)",
+          bottom: "1rem",
+          left: "0.5rem",
+          right: "0.5rem",
           zIndex: 9999,
-          width: "90%",
-          maxWidth: "600px",
         }}
       >
         <div
@@ -56,41 +54,40 @@ const CookieConsent = () => {
             background: "rgba(0, 0, 0, 0.95)",
             backdropFilter: "blur(20px)",
             border: "1px solid rgba(255, 255, 255, 0.1)",
-            borderRadius: "1.5rem",
-            padding: "2rem",
+            borderRadius: "1rem",
+            padding: "1rem",
             boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
           }}
         >
-          <div style={{ display: "flex", gap: "1.5rem", alignItems: "start" }}>
-            {/* Icon */}
+          {/* Mobile-friendly layout */}
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+          >
+            {/* Header with icon */}
             <div
-              style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "12px",
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
+              style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
             >
-              <Cookie size={24} color="white" />
-            </div>
-
-            {/* Content */}
-            <div style={{ flex: 1 }}>
               <div
                 style={{
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "8px",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                   display: "flex",
                   alignItems: "center",
-                  gap: "0.5rem",
-                  marginBottom: "0.75rem",
+                  justifyContent: "center",
+                  flexShrink: 0,
                 }}
+              >
+                <Cookie size={18} color="white" />
+              </div>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
               >
                 <h3
                   style={{
-                    fontSize: "1.25rem",
+                    fontSize: "1rem",
                     fontWeight: 700,
                     color: "white",
                     margin: 0,
@@ -98,84 +95,94 @@ const CookieConsent = () => {
                 >
                   Cookie & Privacy
                 </h3>
-                <Shield size={16} color="#667eea" />
+                <Shield size={14} color="#667eea" />
               </div>
-
-              <p
-                style={{
-                  fontSize: "0.875rem",
-                  color: "rgba(255, 255, 255, 0.7)",
-                  lineHeight: "1.6",
-                  margin: "0 0 1.5rem 0",
-                }}
-              >
-                Utilizziamo cookie essenziali per autenticare il tuo account in
-                modo sicuro. I cookie sono <strong>HTTP-only</strong> e protetti
-                contro XSS. Nessun dato viene condiviso con terze parti.
-              </p>
-
-              {/* Buttons */}
-              <div
-                style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}
-              >
-                <button
-                  onClick={handleAccept}
-                  className="btn-primary"
-                  style={{
-                    padding: "0.75rem 1.5rem",
-                    borderRadius: "50px",
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
-                >
-                  <Check size={16} />
-                  Accetta Cookie
-                </button>
-                <button
-                  onClick={handleReject}
-                  style={{
-                    padding: "0.75rem 1.5rem",
-                    borderRadius: "50px",
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                    background: "rgba(255, 255, 255, 0.05)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    color: "rgba(255, 255, 255, 0.7)",
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = "rgba(255, 255, 255, 0.1)";
-                    e.target.style.color = "white";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = "rgba(255, 255, 255, 0.05)";
-                    e.target.style.color = "rgba(255, 255, 255, 0.7)";
-                  }}
-                >
-                  <X size={16} />
-                  Rifiuta
-                </button>
-              </div>
-
-              <p
-                style={{
-                  fontSize: "0.75rem",
-                  color: "rgba(255, 255, 255, 0.5)",
-                  marginTop: "1rem",
-                  marginBottom: 0,
-                }}
-              >
-                Rifiutando i cookie, non potrai effettuare il login. Puoi
-                modificare le tue preferenze in qualsiasi momento.
-              </p>
             </div>
+
+            {/* Description */}
+            <p
+              style={{
+                fontSize: "0.8rem",
+                color: "rgba(255, 255, 255, 0.7)",
+                lineHeight: "1.5",
+                margin: 0,
+              }}
+            >
+              Utilizziamo cookie essenziali per autenticare il tuo account in
+              modo sicuro. I cookie sono <strong>HTTP-only</strong> e protetti
+              contro XSS.
+            </p>
+
+            {/* Buttons - Stack on mobile */}
+            <div
+              style={{
+                display: "flex",
+                gap: "0.5rem",
+                flexDirection: "row",
+                flexWrap: "wrap",
+              }}
+            >
+              <button
+                onClick={handleAccept}
+                className="btn-primary"
+                style={{
+                  padding: "0.6rem 1rem",
+                  borderRadius: "50px",
+                  fontSize: "0.8rem",
+                  fontWeight: 600,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
+                  flex: 1,
+                  justifyContent: "center",
+                  minWidth: "120px",
+                }}
+              >
+                <Check size={14} />
+                Accetta
+              </button>
+              <button
+                onClick={handleReject}
+                style={{
+                  padding: "0.6rem 1rem",
+                  borderRadius: "50px",
+                  fontSize: "0.8rem",
+                  fontWeight: 600,
+                  background: "rgba(255, 255, 255, 0.05)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  color: "rgba(255, 255, 255, 0.7)",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
+                  flex: 1,
+                  justifyContent: "center",
+                  minWidth: "120px",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = "rgba(255, 255, 255, 0.1)";
+                  e.target.style.color = "white";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = "rgba(255, 255, 255, 0.05)";
+                  e.target.style.color = "rgba(255, 255, 255, 0.7)";
+                }}
+              >
+                <X size={14} />
+                Rifiuta
+              </button>
+            </div>
+
+            <p
+              style={{
+                fontSize: "0.7rem",
+                color: "rgba(255, 255, 255, 0.5)",
+                margin: 0,
+              }}
+            >
+              Rifiutando i cookie, non potrai effettuare il login.
+            </p>
           </div>
         </div>
       </motion.div>

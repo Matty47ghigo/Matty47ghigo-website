@@ -28,6 +28,119 @@ body {
   min-height: 100vh;
 }
 
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  /* Checkout navbar */
+  nav.liquid-glass {
+    width: 95% !important;
+    padding: 0.75rem 1rem !important;
+    borderRadius: 1rem !important;
+    top: 0.75rem !important;
+  }
+  
+  nav.liquid-glass .btn-secondary {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+  
+  /* Dashboard sidebar */
+  .sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: unset !important;
+    position: fixed !important;
+    left: -100% !important;
+    z-index: 1000 !important;
+    transition: left 0.3s ease !important;
+  }
+  
+  .sidebar.open {
+    left: 0 !important;
+  }
+  
+  .main-container {
+    width: 100% !important;
+  }
+  
+  .dashboard-content {
+    padding: 1rem !important;
+  }
+  
+  /* Chat layout */
+  .chat-layout {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  
+  .ticket-sidebar {
+    width: 100% !important;
+    max-height: 200px !important;
+  }
+  
+  /* Forms */
+  input, textarea, select {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+  
+  /* Cards */
+  .card {
+    padding: 1rem !important;
+  }
+  
+  /* Tables */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Buttons */
+  .btn-primary, .btn-secondary {
+    padding: 0.6rem 1rem !important;
+    font-size: 0.875rem !important;
+  }
+  
+  /* Grid layouts */
+  .grid-cols-2, .grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Progress steps */
+  .progress-steps {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+  
+  /* Auth forms */
+  .auth-container {
+    padding: 1rem !important;
+  }
+  
+  /* Order summary */
+  .order-summary {
+    position: relative !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small screens */
+  nav.liquid-glass {
+    padding: 0.5rem 0.75rem !important;
+  }
+  
+  nav.liquid-glass a span {
+    display: none !important;
+  }
+  
+  .dashboard-content {
+    padding: 0.5rem !important;
+  }
+  
+  h1 { font-size: 1.5rem !important; }
+  h2 { font-size: 1.25rem !important; }
+  h3 { font-size: 1rem !important; }
+}
+
 /* Layout Utilities */
 .flex-center {
   display: flex;
