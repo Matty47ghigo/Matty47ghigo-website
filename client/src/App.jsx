@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
+import { Analytics } from "@vercel/analytics/react";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
@@ -82,6 +83,7 @@ function App() {
             }
           />
         </Routes>
+        <Analytics />
       </Router>
     </CartProvider>
   );
