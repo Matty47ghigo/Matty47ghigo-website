@@ -209,8 +209,8 @@ app.post('/api/auth/2fa/login-verify', async (req, res) => {
         user.tempAuthCodeExpires = undefined;
         await user.save();
 
-        const token = generateToken(user._id, user.email);
-        setTokenCookie(res, token);
+        const jwtToken = generateToken(user._id, user.email);
+        setTokenCookie(res, jwtToken);
         res.json({ message: "Login effettuato", user: sanitizeUser(user) });
     } catch (error) {
         res.status(500).json({ message: "Errore durante la verifica del login 2FA" });
