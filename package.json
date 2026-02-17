@@ -6,7 +6,10 @@
     "start:server": "cd server && npm start",
     "start:client": "cd client && npm run dev",
     "install:all": "npm install && cd client && npm install && cd ../server && npm install",
-    "vercel-build": "cd client && npm install && npm run build"
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm install",
+    "vercel-build": "npm run build"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"
