@@ -5,15 +5,16 @@
   "outputDirectory": "client/dist",
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/index.js"
-    },
-    {
       "handle": "filesystem"
     },
     {
       "src": "/(.*)",
       "dest": "/client/dist/index.html"
     }
-  ]
+  ],
+  "functions": {
+    "api/**/*.js": {
+      "includeFiles": "server/**/*"
+    }
+  }
 }
