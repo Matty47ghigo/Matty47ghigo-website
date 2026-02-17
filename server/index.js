@@ -406,8 +406,8 @@ app.post('/api/auth/google', async (req, res) => {
             });
         }
 
-        const token = generateToken(result.user._id, result.user.email);
-        setTokenCookie(res, token);
+        const jwtToken = generateToken(result.user._id, result.user.email);
+        setTokenCookie(res, jwtToken);
         res.json({ message: "Google login successful", user: result.user });
     } catch (error) {
         console.error("Google Auth Error:", error);
