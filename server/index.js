@@ -372,6 +372,16 @@ app.post('/api/auth/link/:provider', async (req, res) => {
 // Google Auth
 app.post('/api/auth/google', async (req, res) => {
     const { token } = req.body;
+
+    if (!token) {
+        return res.status(400).json({ message: "Token mancante" });
+    }
+
+    if (!process.env.GOOGLE_CLIENT_ID) {
+        console.error('GOOGLE_CLIENT_ID non configurato');
+        return res.status(500).json({ message: "Configurazione Google mancante" });
+    }
+
     try {
         const ticket = await client.verifyIdToken({
             idToken: token,
@@ -455,13 +465,25 @@ app.post('/api/auth/github', async (req, res) => {
 // Discord Auth
 app.post('/api/auth/discord', async (req, res) => {
     const { code } = req.body;
+
+    if (!code) {
+        return res.status(400).json({ message: "Code mancante" });
+    }
+
+    if (!process.env.DISCORD_CLIENT_ID || !process.env.DISCORD_CLIENT_SECRET) {
+        console.error('Discord credentials non configurate');
+        return res.status(500).json({ message: "Configurazione Discord mancante" });
+    }
+
+    const redirectUri = process.env.APP_URL ? `${process.env.APP_URL}/callback` : 'https://matty47ghigo-studios.vercel.app/callback';
+
     try {
         const tokenRes = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
             client_id: process.env.DISCORD_CLIENT_ID,
             client_secret: process.env.DISCORD_CLIENT_SECRET,
             grant_type: 'authorization_code',
             code,
-            redirect_uri: 'https://matty47ghigo-website.vercel.app/callback'
+            redirect_uri: redirectUri
         }), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
 
         const userRes = await axios.get('https://discord.com/api/users/@me', {
