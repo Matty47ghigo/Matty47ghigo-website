@@ -9,6 +9,19 @@
       "destination": "/api/index.js"
     }
   ],
+  "routes": [
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
   "functions": {
     "api/**/*.js": {
       "includeFiles": "server/**/*"
