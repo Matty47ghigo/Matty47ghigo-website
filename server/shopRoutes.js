@@ -744,13 +744,10 @@ router.get('/admin/coupons', verifyToken, isAdmin, async (req, res) => {
     try {
         const stripeCoupons = await stripe.coupons.list({ limit: 100 });
         res.json({ coupons: stripeCoupons.data });
-    } catch (stripeError) {
-        console.error('Stripe error:', stripeError);
-        // Return empty list if Stripe is not configured
-        res.json({ coupons: [], error: 'Stripe non configurato' });
     } catch (error) {
         console.error('Get coupons error:', error);
-        res.status(500).json({ message: 'Errore recupero coupon' });
+        // Return empty list if Stripe is not configured
+        res.json({ coupons: [], error: 'Stripe non configurato' });
     }
 });
 
