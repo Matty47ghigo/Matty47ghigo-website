@@ -846,3 +846,58 @@ body {
     padding: 0.5rem 0 !important;
   }
 }
+
+/* City/Postal Code Grid Responsive */
+@media (max-width: 640px) {
+  .form-grid-city {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Billing Form Card Mobile */
+@media (max-width: 640px) {
+  .billing-form-card {
+    padding: 1rem !important;
+  }
+  
+  .billing-form-card h2 {
+    font-size: 1.25rem !important;
+  }
+}
+
+/* Payment Method Buttons Mobile */
+@media (max-width: 640px) {
+  .payment-method {
+    padding: 1rem !important;
+    flex-wrap: wrap !important;
+  }
+  
+  .payment-method > div:first-child {
+    width: 40px !important;
+    height: 28px !important;
+  }
+}
+
+/* Auth Tabs Mobile */
+@media (max-width: 640px) {
+  .auth-tabs {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  
+  .auth-tabs button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* OAuth Buttons Mobile */
+@media (max-width: 640px) {
+  .oauth-buttons {
+    flex-direction: column !important;
+  }
+  
+  .oauth-buttons button {
+    width: 100% !important;
+  }
+}

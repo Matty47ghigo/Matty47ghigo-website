@@ -463,9 +463,9 @@ const Checkout = () => {
           style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1.5rem" }}
         >
           <div
+            className="checkout-layout"
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 400px",
               gap: "3rem",
               alignItems: "start",
             }}
@@ -490,6 +490,7 @@ const Checkout = () => {
                       }}
                     >
                       <div
+                        className="auth-tabs"
                         style={{
                           display: "flex",
                           gap: "2rem",
@@ -540,6 +541,7 @@ const Checkout = () => {
 
                       {/* OAuth Buttons */}
                       <div
+                        className="oauth-buttons"
                         style={{
                           display: "flex",
                           flexDirection: "column",
@@ -915,6 +917,7 @@ const Checkout = () => {
                     exit={{ opacity: 0, x: 20 }}
                   >
                     <div
+                      className="billing-form-card"
                       style={{
                         background: "rgba(255,255,255,0.02)",
                         border: "1px solid var(--border-subtle)",
@@ -952,6 +955,7 @@ const Checkout = () => {
 
                       <form onSubmit={handleBillingSubmit}>
                         <div
+                          className="form-grid-2"
                           style={{
                             display: "grid",
                             gridTemplateColumns: "1fr 1fr",
@@ -1032,6 +1036,7 @@ const Checkout = () => {
                         </div>
 
                         <div
+                          className="form-grid-2"
                           style={{
                             display: "grid",
                             gridTemplateColumns: "1fr 1fr",
@@ -1182,6 +1187,7 @@ const Checkout = () => {
                         </div>
 
                         <div
+                          className="form-grid-city"
                           style={{
                             display: "grid",
                             gridTemplateColumns: "2fr 1fr",
@@ -1403,6 +1409,7 @@ const Checkout = () => {
                       )}
 
                       <div
+                        className="payment-methods"
                         style={{
                           display: "flex",
                           flexDirection: "column",
@@ -1412,6 +1419,7 @@ const Checkout = () => {
                       >
                         <button
                           onClick={() => setPaymentMethod("stripe")}
+                          className="payment-method"
                           style={{
                             display: "flex",
                             alignItems: "center",
@@ -1476,6 +1484,7 @@ const Checkout = () => {
 
                         <button
                           onClick={() => setPaymentMethod("paypal")}
+                          className="payment-method"
                           style={{
                             display: "flex",
                             alignItems: "center",
@@ -1676,6 +1685,7 @@ const Checkout = () => {
 
             {/* Order Summary */}
             <div
+              className="order-summary checkout-sidebar"
               style={{
                 background: "rgba(255,255,255,0.02)",
                 border: "1px solid var(--border-subtle)",
