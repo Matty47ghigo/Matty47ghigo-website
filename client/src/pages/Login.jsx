@@ -7,6 +7,7 @@ import {
   CornerDownRight,
   Eye,
   EyeOff,
+  Send,
 } from "lucide-react";
 import axios from "axios";
 import api from "../utils/api";
@@ -133,6 +134,66 @@ const Login = () => {
     window.location.href =
       "https://discord.com/oauth2/authorize?client_id=1468322361093914882&response_type=code&redirect_uri=https%3A%2F%2Fmatty47ghigo-studios.vercel.app%2Fcallback&scope=identify+email+connections";
   };
+
+  // Telegram Login - called by Telegram Widget
+  const handleTelegramLogin = async (user) => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await axios.post("/api/auth/telegram", {
+        id: user.id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        username: user.username,
+        photo_url: user.photo_url,
+        auth_date: user.auth_date,
+        hash: user.hash,
+      });
+
+      if (res.data.message === "2FA_REQUIRED") {
+        setRequires2FA(true);
+        setTempUserId(res.data.userId);
+        setTempId(res.data.tempId);
+        localStorage.setItem("tempUserId", res.data.userId);
+        localStorage.setItem("tempId", res.data.tempId);
+        return;
+      }
+
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      navigate("/dashboard");
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Telegram authentication failed.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Make handleTelegramLogin available globally for Telegram Widget
+  useEffect(() => {
+    window.onTelegramAuth = handleTelegramLogin;
+
+    // Listen for postMessage from Telegram OAuth popup
+    const handleTelegramMessage = (event) => {
+      // Verify origin for security
+      if (event.origin !== "https://oauth.telegram.org") return;
+
+      if (event.data && event.data.event === "auth_result") {
+        const user = event.data.result;
+        if (user) {
+          handleTelegramLogin(user);
+        }
+      }
+    };
+
+    window.addEventListener("message", handleTelegramMessage);
+
+    return () => {
+      delete window.onTelegramAuth;
+      window.removeEventListener("message", handleTelegramMessage);
+    };
+  }, []);
 
   return (
     <div className="auth-container flex-center">
@@ -427,6 +488,41 @@ const Login = () => {
               style={{ borderColor: "rgba(114, 137, 218, 0.2)" }}
             >
               <MessageSquare size={16} style={{ color: "#7289da" }} /> Discord
+            </button>
+          </div>
+
+          {/* Telegram Login Button */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: "1rem",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                // Open Telegram Login in a popup
+                const width = 300;
+                const height = 400;
+                const left = window.screenX + (window.outerWidth - width) / 2;
+                const top = window.screenY + (window.outerHeight - height) / 2;
+                window.open(
+                  `https://oauth.telegram.org/auth?bot_id=8163306414&origin=${encodeURIComponent(window.location.origin)}&embed=0&request_access=write`,
+                  "telegram_login",
+                  `width=${width},height=${height},left=${left},top=${top},status=0`,
+                );
+              }}
+              className="btn-social"
+              style={{
+                width: "100%",
+                maxWidth: "200px",
+                borderColor: "rgba(0, 136, 204, 0.2)",
+                background:
+                  "linear-gradient(135deg, rgba(0, 136, 204, 0.1), rgba(0, 170, 238, 0.05))",
+              }}
+            >
+              <Send size={16} style={{ color: "#0088cc" }} /> Telegram
             </button>
           </div>
 

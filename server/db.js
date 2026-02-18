@@ -21,7 +21,8 @@ const UserSchema = new mongoose.Schema({
     linkedAccounts: {
         google: { type: String, default: null },
         github: { type: String, default: null },
-        discord: { type: String, default: null }
+        discord: { type: String, default: null },
+        telegram: { type: String, default: null }
     },
     paymentMethods: [{
         type: { type: String },

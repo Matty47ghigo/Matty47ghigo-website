@@ -520,6 +520,83 @@ app.post('/api/auth/discord', async (req, res) => {
     }
 });
 
+// Telegram Auth
+app.post('/api/auth/telegram', async (req, res) => {
+    const { id, first_name, last_name, username, photo_url, auth_date, hash } = req.body;
+
+    if (!id || !auth_date || !hash) {
+        return res.status(400).json({ message: "Dati Telegram mancanti" });
+    }
+
+    if (!process.env.TELEGRAM_BOT_TOKEN) {
+        console.error('Telegram Bot Token non configurato');
+        return res.status(500).json({ message: "Configurazione Telegram mancante" });
+    }
+
+    try {
+        // Verify the hash using Telegram's algorithm
+        // https://core.telegram.org/widgets/login#checking-authorization
+        const botToken = process.env.TELEGRAM_BOT_TOKEN;
+
+        // Create data check string by sorting parameters alphabetically
+        const dataToCheck = Object.keys(req.body)
+            .filter(key => key !== 'hash')
+            .sort()
+            .map(key => `${key}=${req.body[key]}`)
+            .join('\n');
+
+        // Create secret key from bot token
+        const secretKey = crypto.createHash('sha256').update(botToken).digest();
+
+        // Calculate the hash
+        const calculatedHash = crypto
+            .createHmac('sha256', secretKey)
+            .update(dataToCheck)
+            .digest('hex');
+
+        // Compare hashes
+        if (calculatedHash !== hash) {
+            return res.status(401).json({ message: "Verifica Telegram fallita" });
+        }
+
+        // Check if auth_date is not too old (24 hours)
+        const authTimestamp = parseInt(auth_date);
+        const currentTimestamp = Math.floor(Date.now() / 1000);
+        if (currentTimestamp - authTimestamp > 86400) {
+            return res.status(401).json({ message: "Sessione Telegram scaduta" });
+        }
+
+        // Telegram doesn't provide email, so we create a unique one based on Telegram ID
+        const telegramEmail = `telegram_${id}@telegram.user`;
+        const picture = photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(first_name)}&background=0088cc&color=fff`;
+
+        const user = await upsertSocialUser({
+            name: first_name || username || 'Telegram',
+            surname: last_name || '',
+            email: telegramEmail,
+            picture: picture,
+            provider: 'telegram',
+            externalId: id.toString()
+        });
+
+        const result = await handleTwoFactorCheck(user);
+        if (result.requires2FA) {
+            return res.json({
+                message: "2FA_REQUIRED",
+                userId: result.userId,
+                tempId: result.tempId
+            });
+        }
+
+        const token = generateToken(result.user._id, result.user.email);
+        setTokenCookie(res, token);
+        res.json({ message: "Telegram login successful", user: result.user });
+    } catch (error) {
+        console.error("Telegram Auth Error:", error.message);
+        res.status(500).json({ message: `Errore Telegram: ${error.message}` });
+    }
+});
+
 // --- Platform Helpers ---
 
 const summarizeText = (text) => {

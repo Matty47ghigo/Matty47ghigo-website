@@ -15,6 +15,7 @@ import {
   MessageSquare,
   CheckCircle,
   AlertCircle,
+  Send,
 } from "lucide-react";
 import axios from "axios";
 import { useCart } from "../context/CartContext";
@@ -152,6 +153,47 @@ const Checkout = () => {
     window.location.href =
       "https://discord.com/oauth2/authorize?client_id=1468322361093914882&response_type=code&redirect_uri=https%3A%2F%2Fmatty47ghigo-studios.vercel.app%2Fcallback&scope=identify+email+connections";
   };
+
+  const handleTelegramLogin = async (user) => {
+    localStorage.setItem("auth_provider", "telegram");
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/telegram`,
+        {
+          id: user.id,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          username: user.username,
+          photo_url: user.photo_url,
+          auth_date: user.auth_date,
+          hash: user.hash,
+        },
+        { withCredentials: true },
+      );
+      if (response.data.success) {
+        setStep("billing");
+      }
+    } catch (error) {
+      console.error("Telegram login error:", error);
+    }
+  };
+
+  // Listen for Telegram OAuth postMessage
+  React.useEffect(() => {
+    const handleTelegramMessage = (event) => {
+      if (event.origin !== "https://oauth.telegram.org") return;
+      if (event.data && event.data.event === "auth_result") {
+        const user = event.data.result;
+        if (user) {
+          handleTelegramLogin(user);
+        }
+      }
+    };
+    window.addEventListener("message", handleTelegramMessage);
+    return () => {
+      window.removeEventListener("message", handleTelegramMessage);
+    };
+  }, []);
 
   const handleBillingSubmit = async (e) => {
     e.preventDefault();
